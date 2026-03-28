@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#160400">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZENITH">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ZENITH</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#160400;
+  --surface:#1E0700;
+  --card:#250900;
+  --card-hover:#2E0C00;
+  --border:rgba(255,80,0,0.10);
+  --bh:rgba(255,100,20,0.18);
+  --text:#FFF0E8;
+  --muted:#7A4830;
+  --muted2:#AA6840;
+  --fire1:#FF4500;
+  --fire2:#FF6A00;
+  --fire3:#FFB300;
+  --lava:#C0002A;
+  --ember:#FF8C00;
+  --purple-fire:#7B0080;
+  --ok:#FF5722;
+  --tr:#FFB300;
+  --hot:#FF2800;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{max-width:100%;overflow-x:hidden;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;}
+
+/* FIRE BACKGROUND */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 0% 100%,rgba(192,0,42,.18) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 80%,rgba(255,69,0,.12) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(123,0,128,.06) 0%,transparent 50%),
+    radial-gradient(ellipse 100% 40% at 50% 100%,rgba(255,180,0,.07) 0%,transparent 60%);}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4;}
+
+/* ANIMATIONS */
+.particle{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;animation:pr .9s ease-out forwards;}
+@keyframes pr{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+.xpf{position:fixed;pointer-events:none;z-index:9998;font-size:13px;font-weight:800;background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:xpr 1s cubic-bezier(.2,.8,.4,1) forwards;white-space:nowrap;}
+@keyframes xpr{0%{transform:translateY(0) scale(.7);opacity:1}40%{transform:translateY(-24px) scale(1.1);opacity:1}100%{transform:translateY(-50px) scale(.9);opacity:0}}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,100,0,.12);transform:scale(0);animation:ro .5s ease-out forwards;pointer-events:none;}
+@keyframes ro{to{transform:scale(4);opacity:0}}
+@keyframes hpulse{0%{box-shadow:0 0 0 0 rgba(255,180,0,.4)}50%{box-shadow:0 0 0 14px transparent}100%{box-shadow:0 6px 30px rgba(255,69,0,.25)}}
+@keyframes flamePulse{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes xsh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(22,4,0,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,69,0,.15);padding:env(safe-area-inset-top,14px) 14px 0;padding-top:max(env(safe-area-inset-top),14px);}
+.htop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
+.hleft{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.aname{font-size:15px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(135deg,var(--fire2),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}
+.xpchip{display:flex;align-items:center;gap:4px;background:rgba(255,69,0,.08);border:1px solid rgba(255,69,0,.2);border-radius:20px;padding:3px 10px 3px 7px;flex-shrink:0;}
+.xpchip-v{font-size:11px;font-weight:800;background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.xpchip-l{font-size:9px;font-weight:600;color:var(--muted2);}
+.mbtn{font-family:'Sora',sans-serif;font-size:11px;font-weight:600;color:var(--fire2);background:rgba(255,106,0,.08);border:1px solid rgba(255,106,0,.2);border-radius:20px;padding:5px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.xpbr{padding:0 0 10px;}
+.xpbm{display:flex;justify-content:space-between;margin-bottom:4px;}
+.xpbl{font-size:9px;font-weight:700;color:var(--fire2);letter-spacing:.06em;text-transform:uppercase;}
+.xpbp{font-size:9px;font-weight:600;color:var(--muted2);}
+.xpbb{width:100%;height:4px;background:rgba(255,69,0,.1);border-radius:2px;overflow:hidden;}
+.xpbf{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--lava),var(--fire1),var(--fire2),var(--fire3));background-size:200% 100%;transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(255,69,0,.5);animation:xsh 2s linear infinite;}
+
+/* STATS RINGS */
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding-bottom:12px;}
+.sc{background:rgba(32,8,0,.85);border:1px solid rgba(255,69,0,.12);border-radius:14px;padding:9px 8px;display:flex;align-items:center;gap:7px;min-width:0;}
+.rw{position:relative;width:34px;height:34px;flex-shrink:0;}
+.rsvg{width:34px;height:34px;transform:rotate(-90deg);}
+.rbg{fill:none;stroke:rgba(255,69,0,.08);stroke-width:3;}
+.rf{fill:none;stroke-width:3;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);}
+.rv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;}
+.si{flex:1;min-width:0;overflow:hidden;}
+.sn{font-size:17px;font-weight:800;line-height:1;}
+.sl{font-size:8px;font-weight:600;color:var(--muted2);letter-spacing:.06em;text-transform:uppercase;margin-top:2px;white-space:nowrap;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;padding:10px 14px;position:relative;z-index:1;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;padding:8px 12px;border-radius:12px;border:none;background:transparent;color:var(--muted2);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tab.active{background:rgba(255,69,0,.12);color:var(--fire2);border:1px solid rgba(255,69,0,.25);box-shadow:0 2px 12px rgba(255,69,0,.15);}
+main{padding:0 12px 110px;position:relative;z-index:1;}
+
+/* TODAY PRIORITIES BANNER */
+.priorities-banner{background:linear-gradient(135deg,rgba(30,5,0,.9),rgba(20,0,5,.9));border:1px solid rgba(255,69,0,.2);border-radius:18px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
+.priorities-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,69,0,.06),transparent 60%);}
+.pb-label{font-size:9px;font-weight:700;color:var(--fire2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.pb-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;font-size:12px;font-weight:500;}
+.pb-item:last-child{margin-bottom:0;}
+.pb-num{width:20px;height:20px;border-radius:50%;background:rgba(255,69,0,.15);border:1px solid rgba(255,69,0,.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--fire2);flex-shrink:0;}
+.pb-empty{font-size:11px;color:var(--muted2);font-style:italic;}
+
+/* DAY SECTION */
+.day-section{margin-bottom:6px;background:rgba(30,8,0,.8);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:border-color .2s;}
+.day-section.today{border-color:rgba(255,69,0,.35);}
+.day-section.all-done{border-color:rgba(255,180,0,.4);box-shadow:0 0 20px rgba(255,100,0,.08);}
+.dhdr{display:flex;align-items:center;padding:12px 13px;cursor:pointer;gap:10px;-webkit-tap-highlight-color:transparent;user-select:none;}
+.dnum{width:42px;height:42px;border-radius:13px;flex-shrink:0;background:rgba(30,8,0,.8);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.dnv{font-size:17px;font-weight:800;line-height:1;}
+.dnd{font-size:7px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-top:1px;}
+.day-section.today .dnum{background:linear-gradient(135deg,rgba(255,69,0,.2),rgba(192,0,42,.15));border-color:rgba(255,69,0,.35);}
+.day-section.today .dnv{background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dinf{flex:1;min-width:0;}
+.dname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dsub{font-size:10px;color:var(--muted2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dprog{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.mring{width:28px;height:28px;flex-shrink:0;}
+.mrsvg{width:28px;height:28px;transform:rotate(-90deg);}
+.mrbg{fill:none;stroke:rgba(255,69,0,.08);stroke-width:2.5;}
+.mrf{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:63;stroke-dashoffset:63;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);}
+.mpct{font-size:10px;font-weight:700;min-width:26px;text-align:right;}
+.dbody{display:none;padding:0 11px 11px;}
+.dbody.open{display:block;}
+
+/* HABIT HERO (main daily habit block) */
+.hab-hero{width:100%;border-radius:16px;margin-bottom:8px;padding:13px 14px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(30,5,0,.9),rgba(15,0,5,.9));border:1px solid rgba(255,69,0,.18);
+  transition:border-color .25s,box-shadow .25s;}
+.hab-hero.done{border-color:rgba(255,180,0,.5);box-shadow:0 4px 20px rgba(255,69,0,.15);animation:hpulse .6s ease forwards;}
+.hab-layout{display:flex;align-items:center;gap:12px;}
+.hab-icon{width:44px;height:44px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .3s cubic-bezier(.34,1.56,.64,1);background:rgba(255,69,0,.1);border:1px solid rgba(255,69,0,.2);}
+.hab-hero.done .hab-icon{transform:scale(1.08);}
+.hab-cont{flex:1;min-width:0;}
+.hab-name{font-size:14px;font-weight:700;letter-spacing:-.2px;}
+.hab-desc{font-size:10px;color:var(--muted2);margin-top:1px;}
+.hab-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.hab-xp{font-size:10px;font-weight:800;background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hab-chk{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,69,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.hab-hero.done .hab-chk{background:linear-gradient(135deg,var(--fire1),var(--fire3));border-color:transparent;box-shadow:0 0 14px rgba(255,69,0,.55);}
+.chksvg{overflow:visible;}
+.chkp{fill:none;stroke:white;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:28;stroke-dashoffset:28;transition:stroke-dashoffset .35s cubic-bezier(.4,0,.2,1) .1s;}
+.hab-hero.done .chkp{stroke-dashoffset:0;}
+
+/* NOTES BTN */
+.notes-btn{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,69,0,.15);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  flex-shrink:0;cursor:pointer;position:relative;
+  transition:background .2s,border-color .2s,transform .12s;
+  -webkit-tap-highlight-color:transparent;}
+.notes-btn:active{transform:scale(.86);}
+.notes-btn.has-notes{background:rgba(255,106,0,.18);border-color:rgba(255,106,0,.45);}
+.nb-dot{display:none;position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--fire2);border:2px solid var(--card);}
+.notes-btn.has-notes .nb-dot{display:block;}
+
+/* HABIT LIST ROWS */
+.hlist{display:flex;flex-direction:column;gap:0;background:rgba(28,8,0,.75);border-radius:16px;overflow:hidden;border:1px solid rgba(255,69,0,.1);}
+.hrow{display:flex;align-items:center;padding:13px 14px;gap:12px;position:relative;overflow:hidden;cursor:pointer;border-bottom:1px solid rgba(255,69,0,.07);transition:background .2s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.hrow:last-child{border-bottom:none;}
+.hrow:active{background:rgba(255,69,0,.04);}
+.hrow.done{background:rgba(255,69,0,.04);opacity:0.52;transition:opacity .3s ease;}
+.hrow-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+.hrow.done .hrow-icon{transform:scale(1.0);filter:grayscale(0.4);}
+.hrow-text{flex:1;min-width:0;}
+.hrow-name{font-size:13px;font-weight:700;line-height:1.2;}
+.hrow-desc{font-size:10px;color:var(--muted2);margin-top:1px;}
+.hrow-right{display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.hrow-xp{font-size:10px;font-weight:700;color:var(--muted2);flex-shrink:0;transition:color .3s;}
+.hrow.done .hrow-xp{color:var(--fire2);}
+.hrow-toggle{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,69,0,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;}
+.hrow.done .hrow-toggle{border-color:transparent;background:linear-gradient(135deg,var(--fire1),var(--fire2));}
+.hrow-check{fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .3s cubic-bezier(.4,0,.2,1) .08s;}
+.hrow.done .hrow-check{stroke-dashoffset:0;}
+/* small notes btn in rows */
+.row-note-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,69,0,.15);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;cursor:pointer;position:relative;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.row-note-btn.has-notes{background:rgba(255,106,0,.15);border-color:rgba(255,106,0,.4);}
+.row-note-btn .nb-dot{width:7px;height:7px;}
+
+/* NOTES PANEL */
+.notes-panel{overflow:hidden;max-height:0;opacity:0;margin-top:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s ease,margin-top .25s ease;}
+.notes-panel.open{max-height:380px;opacity:1;margin-top:8px;}
+.notes-inner{background:rgba(28,8,0,.9);border:1px solid rgba(255,69,0,.15);border-radius:14px;overflow:hidden;}
+.notes-header{display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid rgba(255,69,0,.1);}
+.notes-icon{font-size:13px;}
+.notes-title{font-size:9px;font-weight:700;color:var(--muted2);letter-spacing:.07em;text-transform:uppercase;flex:1;}
+.notes-area{width:100%;min-height:100px;max-height:260px;background:transparent;border:none;outline:none;resize:none;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);line-height:1.7;padding:12px 14px;caret-color:var(--fire2);}
+.notes-area::placeholder{color:var(--muted);font-style:italic;}
+.notes-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 13px;border-top:1px solid rgba(255,69,0,.08);}
+.notes-saved{font-size:9px;font-weight:600;color:var(--muted);transition:color .3s;}
+.notes-saved.flash{color:var(--fire2);}
+.notes-hint{font-size:9px;color:var(--muted);}
+
+/* PRIORITIES INPUT SECTION */
+.priorities-section{background:rgba(28,8,0,.8);border:1px solid rgba(255,69,0,.15);border-radius:16px;padding:13px;margin-top:8px;}
+.ps-label{font-size:9px;font-weight:700;color:var(--fire2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.ps-input-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.ps-num{width:22px;height:22px;border-radius:50%;background:rgba(255,69,0,.12);border:1px solid rgba(255,69,0,.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--fire2);flex-shrink:0;}
+.ps-input{flex:1;background:rgba(255,69,0,.05);border:1px solid rgba(255,69,0,.12);border-radius:10px;padding:8px 11px;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);outline:none;transition:border-color .2s;}
+.ps-input:focus{border-color:rgba(255,69,0,.35);}
+.ps-input::placeholder{color:var(--muted);}
+.ps-saved{font-size:9px;color:var(--muted);margin-top:4px;transition:color .3s;}
+.ps-saved.flash{color:var(--fire2);}
+
+/* TODAY BTN */
+.today-btn{position:fixed;bottom:max(22px,env(safe-area-inset-bottom,22px));right:16px;z-index:200;background:linear-gradient(135deg,var(--fire1),var(--fire2));color:white;border:none;border-radius:50px;padding:12px 20px;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;box-shadow:0 4px 24px rgba(255,69,0,.45);}
+.today-btn:active{transform:scale(.97);}
+
+/* MONTH OVERLAY */
+.movl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;backdrop-filter:blur(8px);}
+.movl.open{display:flex;}
+.msh{background:#0E0300;border:1px solid rgba(255,69,0,.2);border-radius:22px 22px 0 0;padding:18px 14px max(36px,env(safe-area-inset-bottom,36px));width:100%;}
+.msh h3{font-size:14px;font-weight:700;text-align:center;margin-bottom:12px;color:var(--fire2);}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.mopt{padding:10px;border-radius:12px;border:1px solid rgba(255,69,0,.12);background:rgba(32,8,0,.85);color:var(--muted2);font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+.mopt.active{background:rgba(255,69,0,.12);border-color:rgba(255,69,0,.4);color:var(--fire2);}
+
+/* SUMMARY */
+.swrap{display:flex;flex-direction:column;gap:10px;}
+.scard{background:rgba(30,8,0,.8);border:1px solid rgba(255,69,0,.12);border-radius:18px;padding:16px;}
+.slbl{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.srow2{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,69,0,.07);}
+.srow2:last-child{border-bottom:none;}
+.srl{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sv{font-size:16px;font-weight:700;}
+.sbrw{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.sbb{flex:1;height:5px;border-radius:3px;background:rgba(255,69,0,.08);overflow:hidden;}
+.sbf{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.hgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;}
+.hlb{font-size:8px;font-weight:600;color:var(--muted);text-align:center;}
+.hc{aspect-ratio:1;border-radius:5px;background:rgba(255,69,0,.04);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);border:1px solid transparent;}
+.hc.h1{background:rgba(255,69,0,.1);color:rgba(255,100,0,.6);}
+.hc.h2{background:rgba(255,100,0,.2);color:var(--fire2);}
+.hc.h3{background:rgba(255,69,0,.14);border-color:var(--fire1);color:var(--fire1);}
+.hc.toh{border-color:var(--fire3)!important;}
+
+/* INSTALL BANNER */
+#installBanner{display:none;position:fixed;bottom:max(90px,calc(env(safe-area-inset-bottom)+90px));left:12px;right:12px;z-index:250;background:rgba(18,5,0,.95);border:1px solid rgba(255,69,0,.3);border-radius:18px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+#installBanner.show{display:flex;align-items:center;gap:12px;}
+.ib-icon{font-size:22px;flex-shrink:0;}
+.ib-text{flex:1;min-width:0;}
+.ib-title{font-size:12px;font-weight:700;}
+.ib-sub{font-size:10px;color:var(--muted2);margin-top:2px;}
+.ib-btn{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:white;background:linear-gradient(135deg,var(--fire1),var(--fire2));border:none;border-radius:12px;padding:7px 13px;cursor:pointer;flex-shrink:0;}
+.ib-close{font-size:16px;color:var(--muted);cursor:pointer;flex-shrink:0;line-height:1;padding:4px;}
+
+/* EXPENSES SECTION */
+.exp-wrap{display:flex;flex-direction:column;gap:10px;}
+.exp-add-card{background:rgba(30,8,0,.8);border:1px solid rgba(255,69,0,.15);border-radius:18px;padding:16px;}
+.exp-form{display:flex;flex-direction:column;gap:10px;}
+.exp-row{display:flex;gap:8px;}
+.exp-input{flex:1;background:rgba(255,69,0,.05);border:1px solid rgba(255,69,0,.12);border-radius:12px;padding:10px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s;}
+.exp-input:focus{border-color:rgba(255,69,0,.35);}
+.exp-input::placeholder{color:var(--muted);}
+.exp-select{background:rgba(255,69,0,.05);border:1px solid rgba(255,69,0,.12);border-radius:12px;padding:10px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;flex:1.2;}
+.exp-add-btn{background:linear-gradient(135deg,var(--fire1),var(--fire2));color:white;border:none;border-radius:12px;padding:11px 18px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.exp-add-btn:active{opacity:.8;}
+.exp-list-card{background:rgba(30,8,0,.8);border:1px solid rgba(255,69,0,.12);border-radius:18px;overflow:hidden;}
+.exp-list-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,69,0,.1);}
+.exp-total{font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.exp-total-label{font-size:10px;color:var(--muted2);}
+.exp-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,69,0,.06);}
+.exp-item:last-child{border-bottom:none;}
+.exp-cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.exp-item-text{flex:1;min-width:0;}
+.exp-item-name{font-size:13px;font-weight:600;}
+.exp-item-cat{font-size:10px;color:var(--muted2);margin-top:1px;}
+.exp-item-amt{font-size:14px;font-weight:700;color:var(--fire2);flex-shrink:0;}
+.exp-item-del{font-size:16px;color:var(--muted);cursor:pointer;padding:4px;flex-shrink:0;}
+.exp-empty{padding:20px;text-align:center;color:var(--muted2);font-size:12px;font-style:italic;}
+.cat-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px 16px;border-top:1px solid rgba(255,69,0,.1);}
+.cat-chip{background:rgba(255,69,0,.06);border:1px solid rgba(255,69,0,.1);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:6px;}
+.cat-chip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cat-chip-label{font-size:10px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-chip-val{font-size:11px;font-weight:700;color:var(--fire2);}
+
+/* RECIPES SECTION */
+.recipes-wrap{display:flex;flex-direction:column;gap:8px;}
+.recipe-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.rf-btn{font-family:'Sora',sans-serif;font-size:10px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,69,0,.15);background:transparent;color:var(--muted2);cursor:pointer;transition:all .2s;}
+.rf-btn.active{background:rgba(255,69,0,.12);border-color:rgba(255,69,0,.35);color:var(--fire2);}
+.recipe-card{background:rgba(30,8,0,.8);border:1px solid rgba(255,69,0,.12);border-radius:18px;overflow:hidden;transition:border-color .2s;}
+.recipe-card.cooked{border-color:rgba(255,180,0,.4);}
+.rc-header{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.rc-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:rgba(255,69,0,.08);border:1px solid rgba(255,69,0,.12);}
+.rc-info{flex:1;min-width:0;}
+.rc-name{font-size:14px;font-weight:700;line-height:1.2;}
+.rc-meta{font-size:10px;color:var(--muted2);margin-top:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rc-time{display:flex;align-items:center;gap:3px;}
+.rc-cook-btn{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;padding:7px 13px;border-radius:12px;border:none;cursor:pointer;transition:all .2s;flex-shrink:0;white-space:nowrap;}
+.rc-cook-btn.can-cook{background:linear-gradient(135deg,var(--fire1),var(--fire2));color:white;}
+.rc-cook-btn.cooked-done{background:rgba(255,180,0,.15);border:1px solid rgba(255,180,0,.3);color:var(--fire3);}
+.rc-cook-btn.locked{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--muted);cursor:not-allowed;}
+.rc-body{display:none;padding:0 14px 14px;}
+.rc-body.open{display:block;}
+.rc-section-title{font-size:9px;font-weight:700;color:var(--fire2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;margin-top:12px;}
+.rc-macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px;}
+.macro-chip{background:rgba(255,69,0,.06);border:1px solid rgba(255,69,0,.1);border-radius:10px;padding:8px;text-align:center;}
+.macro-val{font-size:14px;font-weight:700;color:var(--fire2);}
+.macro-label{font-size:8px;color:var(--muted2);margin-top:1px;}
+.rc-ingredients{display:flex;flex-wrap:wrap;gap:5px;}
+.ingredient-tag{background:rgba(255,69,0,.07);border:1px solid rgba(255,69,0,.12);border-radius:8px;padding:4px 9px;font-size:11px;}
+.rc-steps{list-style:none;padding:0;}
+.rc-steps li{display:flex;gap:10px;margin-bottom:10px;font-size:12px;line-height:1.6;}
+.step-num{width:22px;height:22px;border-radius:50%;background:rgba(255,69,0,.12);border:1px solid rgba(255,69,0,.25);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--fire2);flex-shrink:0;margin-top:1px;}
+
+/* ICON COLOR VARIANTS */
+.ic-red{background:rgba(255,69,0,.1);border-color:rgba(255,69,0,.2);}
+.ic-orange{background:rgba(255,140,0,.1);border-color:rgba(255,140,0,.2);}
+.ic-yellow{background:rgba(255,180,0,.1);border-color:rgba(255,180,0,.2);}
+.ic-purple{background:rgba(123,0,128,.12);border-color:rgba(150,0,160,.2);}
+.ic-lava{background:rgba(192,0,42,.1);border-color:rgba(192,0,42,.2);}
+.ic-ember{background:rgba(255,87,34,.1);border-color:rgba(255,87,34,.2);}
+
+
+/* MOTIVATION TOAST */
+.mtoast{display:none;margin:2px 0 4px 0;
+  background:linear-gradient(135deg,rgba(25,8,0,.97),rgba(15,3,0,.97));
+  border:1px solid rgba(255,120,0,.3);border-radius:12px;
+  padding:10px 13px;
+  box-shadow:0 4px 16px rgba(255,69,0,.12);}
+.mtoast.show{display:flex;align-items:flex-start;gap:10px;}
+.mtoast-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.mtoast-body{flex:1;min-width:0;}
+.mtoast-title{font-size:10px;font-weight:800;color:var(--fire2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;}
+.mtoast-text{font-size:11px;line-height:1.5;color:var(--text);opacity:.85;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,69,0,.2);border-radius:2px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="htop">
+    <div class="hleft">
+      <span class="aname"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="display:inline-block;vertical-align:middle;margin-right:5px"><defs><linearGradient id="zg" x1="0" y1="0" x2="22" y2="22" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#FF4500"/><stop offset="50%" stop-color="#FF8C00"/><stop offset="100%" stop-color="#FFB300"/></linearGradient></defs><rect x="1" y="1" width="20" height="20" rx="6" fill="rgba(255,69,0,0.12)" stroke="rgba(255,120,0,0.4)" stroke-width="1.2"/><text x="11" y="16" text-anchor="middle" font-family="Sora,sans-serif" font-weight="800" font-size="14" fill="url(#zg)">Z</text></svg>ZENITH</span>
+      <div class="xpchip"><span style="font-size:11px">⚡</span><span class="xpchip-v" id="xcv">0 XP</span><span class="xpchip-l" id="xcl">· LVL 1</span></div>
+    </div>
+    <button class="mbtn" onclick="openMS()" id="mbadge">Marzec</button>
+  </div>
+  <div class="xpbr">
+    <div class="xpbm"><span class="xpbl" id="xplv">Recruit</span><span class="xpbp"><span id="xpcur">0</span> / <span id="xpmax">200</span> XP</span></div>
+    <div class="xpbb"><div class="xpbf" id="xpfill" style="width:0%"></div></div>
+  </div>
+  <div class="srow">
+    <div class="sc">
+      <div class="rw"><svg class="rsvg" viewBox="0 0 34 34"><defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF4500"/><stop offset="100%" stop-color="#FFB300"/></linearGradient>
+        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF2800"/><stop offset="100%" stop-color="#FF6A00"/></linearGradient>
+        <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFB300"/><stop offset="100%" stop-color="#FF4500"/></linearGradient>
+      </defs><circle class="rbg" cx="17" cy="17" r="13"/><circle class="rf" id="rTr" cx="17" cy="17" r="13" stroke="url(#g1)"/></svg><div class="rv" id="rTrN" style="color:var(--fire2)">0</div></div>
+      <div class="si"><div class="sn" id="sTr" style="background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</div><div class="sl">Streak</div></div>
+    </div>
+    <div class="sc">
+      <div class="rw"><svg class="rsvg" viewBox="0 0 34 34"><circle class="rbg" cx="17" cy="17" r="13"/><circle class="rf" id="rSt" cx="17" cy="17" r="13" stroke="url(#g2)"/></svg><div class="rv" id="rStN" style="color:var(--fire1)">0</div></div>
+      <div class="si"><div class="sn" id="sSt" style="background:linear-gradient(135deg,var(--hot),var(--fire1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</div><div class="sl">Nawyki</div></div>
+    </div>
+    <div class="sc">
+      <div class="rw"><svg class="rsvg" viewBox="0 0 34 34"><circle class="rbg" cx="17" cy="17" r="13"/><circle class="rf" id="rPct" cx="17" cy="17" r="13" stroke="url(#g3)"/></svg><div class="rv" id="rPctN" style="color:var(--fire3);font-size:7px">0%</div></div>
+      <div class="si"><div class="sn" id="sPct" style="background:linear-gradient(135deg,var(--fire3),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0%</div><div class="sl">Średnia</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="swTab('days',this)">📅 Dni</button>
+  <button class="tab" onclick="swTab('expenses',this)">💰 Wydatki</button>
+  <button class="tab" onclick="swTab('recipes',this)">🍳 Przepisy</button>
+  <button class="tab" onclick="swTab('summary',this)">📊 Statystyki</button>
+</div>
+<main id="MC"></main>
+<button class="today-btn" onclick="goToday()">Dzisiaj →</button>
+
+<div class="movl" id="movl" onclick="clovl(event)">
+  <div class="msh"><h3>Wybierz miesiąc</h3><div class="mgrid" id="mgrid"></div></div>
+</div>
+<div id="installBanner">
+  <span class="ib-icon">📲</span>
+  <div class="ib-text"><div class="ib-title">Zainstaluj ZENITH</div><div class="ib-sub">Dodaj do ekranu głównego</div></div>
+  <button class="ib-btn" id="installBtn">Zainstaluj</button>
+  <span class="ib-close" onclick="document.getElementById('installBanner').classList.remove('show')">✕</span>
+</div>
+
+<script>
+// ── CONSTANTS ──
+const MPL=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+const DPL=['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
+const DSH=['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
+const SD=1; // start day
+// dow: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
+
+// DAILY habits (every day)
+const DAILY_HABITS=[
+  {id:'woda',    name:'Nawodnienie z rana',desc:'500ml po przebudzeniu',  icon:'💧',ic:'ic-orange', xp:10},
+  {id:'ksiazka', name:'Czytanie książki', desc:'1 rozdział',            icon:'📖',ic:'ic-red',    xp:15},
+  {id:'planowanie',name:'Wieczorne planowanie',desc:'2 priorytety na jutro',icon:'🎯',ic:'ic-yellow',xp:15},
+  {id:'wdziecznosc',name:'Wdzięczność',  desc:'5 rzeczy wdzięczności + 2 zwycięstwa dnia',icon:'🙏',ic:'ic-purple', xp:15},
+  {id:'wydatki',  name:'Zapisanie wydatków',desc:'Zapisz po każdej zapłacie', icon:'💳',ic:'ic-ember',  xp:10},
+  {id:'scroll',   name:'Bez scrollowania',desc:'Nie wyłączaj blokady',  icon:'🚫',ic:'ic-lava',   xp:15},
+];
+
+// CONDITIONAL habits
+const COND_HABITS=[
+  {id:'jezyk',  name:'Nauka języka obcego',desc:'20 minut dziennie',    icon:'🗣️',ic:'ic-orange',xp:20,days:[0,1,2,3]}, // Mon-Thu
+  {id:'ai',     name:'Nauka AI',    desc:'Materiały / projekty',icon:'🤖',ic:'ic-purple',xp:25,days:[4,5]}, // Fri-Sat
+  {id:'gotowanie',name:'Gotowanie', desc:'Ugotuj przepis',icon:'🍳',ic:'ic-red',  xp:20,days:[6,4]}, // Sun,Fri
+];
+
+const EXP_CATS=[
+  {id:'jedzenie',  label:'Jedzenie',   color:'#FF4500'},
+  {id:'rozrywka',  label:'Rozrywka',   color:'#FF6A00'},
+  {id:'nauka',     label:'Nauka',      color:'#FFB300'},
+  {id:'zdrowie',   label:'Zdrowie',    color:'#C0002A'},
+  {id:'transport', label:'Transport',  color:'#7B0080'},
+  {id:'ubrania',   label:'Ubrania',    color:'#FF5722'},
+  {id:'mieszkanie',label:'Mieszkanie', color:'#FF8C00'},
+  {id:'inne',      label:'Inne',       color:'#8A5030'},
+];
+
+const LVS=[
+  {n:'Novice',  min:0,    max:300},
+  {n:'Blazer',  min:300,  max:700},
+  {n:'Ember',   min:700,  max:1400},
+  {n:'Inferno', min:1400, max:2500},
+  {n:'Legend',  min:2500, max:6000},
+];
+
+const today=new Date();
+let cy=today.getFullYear(), cm=today.getMonth();
+let ctab='days';
+
+// ── STORAGE ──
+const sk=()=>`apex2_${cy}_${cm}`;
+const ld=()=>{try{return JSON.parse(localStorage.getItem(sk())||'{}')}catch{return{}}};
+const sv=d=>localStorage.setItem(sk(),JSON.stringify(d));
+const gdd=d=>ld()[d]||{};
+const sdd=(d,f,v)=>{const D=ld();if(!D[d])D[d]={};D[d][f]=v;sv(D);};
+
+const nk=()=>`apex2_notes_${cy}_${cm}`;
+const ldN=()=>{try{return JSON.parse(localStorage.getItem(nk())||'{}')}catch{return{}}};
+const svN=d=>localStorage.setItem(nk(),JSON.stringify(d));
+const getNote=(day,hid)=>(ldN()[day]||{})[hid]||'';
+const setNote=(day,hid,val)=>{const N=ldN();if(!N[day])N[day]={};N[day][hid]=val;svN(N);};
+
+// Priorities stored as flat global key: "YYYY-MM-DD"
+function prioDateKey(y,m,d){return y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d);}
+function getPrios(day){
+  const key='apex2_prio_'+prioDateKey(cy,cm+1,day);
+  try{return JSON.parse(localStorage.getItem(key)||'{"prio1":"","prio2":""}');}catch{return{prio1:'',prio2:''};}
+}
+function setPrio(day,k,v){
+  const key='apex2_prio_'+prioDateKey(cy,cm+1,day);
+  const p=getPrios(day);p[k]=v;
+  localStorage.setItem(key,JSON.stringify(p));
+}
+function getPrevDayPrios(day){
+  // Get the actual previous calendar day
+  const date=new Date(cy,cm,day);
+  date.setDate(date.getDate()-1);
+  const key='apex2_prio_'+prioDateKey(date.getFullYear(),date.getMonth()+1,date.getDate());
+  try{return JSON.parse(localStorage.getItem(key)||'{"prio1":"","prio2":""}');}catch{return{prio1:'',prio2:''};}
+}
+
+const expKey=()=>`apex2_exp_${cy}_${cm}`;
+const ldE=()=>{try{return JSON.parse(localStorage.getItem(expKey())||'[]')}catch{return[]}};
+const svE=d=>localStorage.setItem(expKey(),JSON.stringify(d));
+
+const cookKey=()=>`apex2_cooked`;
+const ldC=()=>{try{return JSON.parse(localStorage.getItem(cookKey())||'{}')}catch{return{}}};
+const svC=d=>localStorage.setItem(cookKey(),JSON.stringify(d));
+
+// ── DATE HELPERS ──
+const gdim=(y,m)=>new Date(y,m+1,0).getDate();
+const gdow=(y,m,d)=>(new Date(y,m,d).getDay()+6)%7;
+const isT=d=>today.getDate()===d&&today.getMonth()===cm&&today.getFullYear()===cy;
+const todayDow=()=>gdow(cy,cm,today.getDate());
+
+function getHabitsForDow(dow){
+  const cond=COND_HABITS.filter(h=>h.days.includes(dow));
+  return{daily:DAILY_HABITS,cond};
+}
+
+function cs(day){
+  const dow=gdow(cy,cm,day);
+  const{daily,cond}=getHabitsForDow(dow);
+  const dd=gdd(day);
+  let done=0,max=daily.length+cond.length;
+  daily.forEach(h=>{if(dd[h.id])done++;});
+  cond.forEach(h=>{if(dd[h.id])done++;});
+  return{done,max};
+}
+
+function cStreak(){
+  const n=gdim(cy,cm),fd=(cy===2026&&cm===2)?SD:1;
+  const st=isT(today.getDate())?today.getDate():n;
+  let s=0;
+  for(let d=st;d>=fd;d--){if(cs(d).done>0)s++;else break;}
+  return s;
+}
+
+function cXP(){
+  const n=gdim(cy,cm),fd=(cy===2026&&cm===2)?SD:1;
+  let x=0;
+  for(let d=fd;d<=n;d++){
+    const dd=gdd(d);
+    DAILY_HABITS.forEach(h=>{if(dd[h.id])x+=h.xp;});
+    const dow=gdow(cy,cm,d);
+    COND_HABITS.filter(h=>h.days.includes(dow)).forEach(h=>{if(dd[h.id])x+=h.xp;});
+  }
+  return x;
+}
+
+function gLv(xp){let l=LVS[0];for(let i=LVS.length-1;i>=0;i--){if(xp>=LVS[i].min){l=LVS[i];break;}}return l;}
+
+// ── ZENITH SOUND ENGINE — unique sound per habit ──
+const SFX=(() => {
+  let ctx=null;
+  function getCtx(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx;}
+  function sine(freq,t,dur,vol,endFreq){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(freq,t);if(endFreq)o.frequency.exponentialRampToValueAtTime(endFreq,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.start(t);o.stop(t+dur+0.02);}
+  function tri(freq,t,dur,vol){const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.start(t);o.stop(t+dur+0.02);}
+  function thud(freq,t,vol=0.4){const c=getCtx(),o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=400;o.connect(lp);lp.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(freq*2.5,t);o.frequency.exponentialRampToValueAtTime(freq,t+0.08);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.28);o.start(t);o.stop(t+0.31);}
+  function crackle(t,vol=0.06,dur=0.05){const c=getCtx(),buf=c.createBuffer(1,Math.ceil(c.sampleRate*dur),c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const src=c.createBufferSource();src.buffer=buf;const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=800;const g=c.createGain();src.connect(hp);hp.connect(g);g.connect(c.destination);g.gain.setValueAtTime(vol,t);src.start(t);src.stop(t+dur+0.01);}
+  function chord(freqs,t,dur,vol){freqs.forEach(f=>sine(f,t,dur,vol));}
+  return {
+    // Woda — realistyczna kropla: "plop" z rezonansem wody
+    woda(){
+      const c=getCtx(),t=c.currentTime;
+      // Główna kropla — szybki pitch drop jak uderzenie o wodę
+      sine(900,t,0.08,0.28,200);
+      sine(600,t+0.02,0.1,0.18,120);
+      // Echo/rezonans — jak ripple w wodzie
+      sine(400,t+0.06,0.18,0.12,180);
+      sine(250,t+0.1,0.22,0.09,130);
+      thud(65,t,0.22);
+    },
+    // Ksiazka — przesuwanie kartki: papierowy szmer + "fwip"
+    ksiazka(){
+      const c=getCtx(),t=c.currentTime;
+      // Szmer papieru — filtered noise
+      crackle(t,0.22,0.12);
+      crackle(t+0.04,0.16,0.1);
+      crackle(t+0.09,0.10,0.08);
+      // Cienki ton kartki
+      sine(2200,t,0.06,0.07,800);
+      sine(1400,t+0.03,0.09,0.06,600);
+    },
+    // Planowanie — precyzyjny klik długopisu + "checkmark" tone
+    planowanie(){
+      const c=getCtx(),t=c.currentTime;
+      crackle(t,0.20,0.025);
+      sine(800,t+0.02,0.06,0.18,600);
+      sine(1046,t+0.07,0.14,0.14,1200);
+      sine(1400,t+0.12,0.18,0.10);
+    },
+    // Wdziecznosc — ciepłe dzwony kościelne: pełny akord
+    wdziecznosc(){
+      const c=getCtx(),t=c.currentTime;
+      chord([261,329,392],t,0.9,0.13);
+      chord([329,415,523],t+0.22,0.7,0.10);
+      sine(659,t+0.4,0.6,0.08);
+      sine(784,t+0.55,0.5,0.06);
+      thud(65,t,0.18);
+    },
+    // Wydatki — metaliczny ping kasy fiskalnej
+    wydatki(){
+      const c=getCtx(),t=c.currentTime;
+      crackle(t,0.14,0.02);
+      sine(1800,t,0.06,0.20,1200);
+      sine(1200,t+0.03,0.12,0.16,900);
+      sine(900,t+0.06,0.2,0.14);
+      sine(600,t+0.12,0.3,0.10);
+    },
+    // Scroll — twardy "lock" — głuchy impakt + niski finał
+    scroll(){
+      const c=getCtx(),t=c.currentTime;
+      thud(45,t,0.42);
+      thud(70,t+0.03,0.28);
+      crackle(t,0.14,0.03);
+      sine(160,t+0.04,0.14,0.16,80);
+    },
+    // Jezyk — wesołe "ding-dong" jak nauczenie się słowa
+    jezyk(){
+      const c=getCtx(),t=c.currentTime;
+      [523,659,784,1046].forEach((f,i)=>sine(f,t+i*0.09,0.28-i*0.04,0.16-i*0.02));
+      thud(80,t,0.16);
+    },
+    // AI — futurystyczny sweep + elektroniczny impuls
+    ai(){
+      const c=getCtx(),t=c.currentTime;
+      sine(180,t,0.35,0.18,1400);
+      crackle(t+0.08,0.12,0.025);
+      sine(1800,t+0.18,0.08,0.14,2200);
+      sine(2200,t+0.24,0.18,0.10,1600);
+      sine(800,t+0.32,0.22,0.08);
+    },
+    // Gotowanie — sizzle oleju + bulgot
+    gotowanie(){
+      const c=getCtx(),t=c.currentTime;
+      crackle(t,0.26,0.16);
+      crackle(t+0.06,0.20,0.12);
+      crackle(t+0.12,0.16,0.10);
+      thud(110,t+0.04,0.28);
+      sine(280,t+0.08,0.22,0.12,180);
+      sine(180,t+0.18,0.28,0.10,120);
+    },
+    undo(){const c=getCtx(),t=c.currentTime;thud(55,t,0.18);sine(260,t,0.14,0.06,150);},
+    complete(){
+      const c=getCtx(),t=c.currentTime;
+      thud(55,t,0.55);thud(82,t+0.05,0.35);crackle(t,0.1,0.06);
+      [[220,0.08],[277,0.18],[330,0.28],[440,0.38],[554,0.50]].forEach(([f,dt])=>sine(f,t+dt,0.55-dt*0.3,0.13));
+      [[440,0],[554,0],[660,0],[880,0.04]].forEach(([f,dt])=>sine(f,t+0.62+dt,0.9,0.10));
+      thud(55,t+0.60,0.40);[1100,1320,1760].forEach((f,i)=>sine(f,t+0.65+i*0.06,0.6,0.05));
+    }
+  };
+})();
+
+// ── MOTIVATION MESSAGES ──
+const MOTIV={
+  woda:[
+    {icon:'💧',title:'Metabolizm włączony!',text:'500ml wody rano przyspiesza metabolizm o 24% przez pierwsze 90 minut. Właśnie dałeś ciału sygnał startowy.'},
+    {icon:'💧',title:'Mózg na pełnych obrotach!',text:'Już 2% odwodnienie obniża koncentrację i pamięć krótkotrwałą. Właśnie temu zapobiegłeś.'},
+    {icon:'💧',title:'Energia bez kofeiny!',text:'Poranne zmęczenie to często efekt nocnego odwodnienia. Woda przywraca poziom energii szybciej niż kawa.'},
+    {icon:'💧',title:'Nerki mówią dziękuję!',text:'Poranna woda wypłukuje toksyny zgromadzone podczas snu i wspomaga pracę nerek przez cały dzień.'},
+    {icon:'💧',title:'Skóra i stawy!',text:'Regularne nawodnienie rano poprawia elastyczność skóry i smaruje stawy — efekty widoczne po 3 tygodniach.'},
+  ],
+  ksiazka:[
+    {icon:'📖',title:'Stres w dół!',text:'Już 6 minut czytania obniża poziom kortyzolu o 68%. To skuteczniejsze niż spacer czy muzyka.'},
+    {icon:'📖',title:'Słownictwo rośnie!',text:'Rozdział dziennie przez rok dodaje do aktywnego słownika ok. 3000 słów. Mówisz lepiej, myślisz precyzyjniej.'},
+    {icon:'📖',title:'Empatia trenowana!',text:'Czytanie prozy aktywuje te same obszary mózgu co prawdziwe doświadczenia społeczne — ćwiczysz empatię.'},
+    {icon:'📖',title:'Alzheimer odpada!',text:'Osoby czytające regularnie mają o 32% mniejsze ryzyko choroby Alzheimera. Każdy rozdział to ochrona.'},
+    {icon:'📖',title:'Głębszy sen!',text:'Czytanie przed snem skraca czas zasypiania o 50% i poprawia jakość snu głębokiego.'},
+  ],
+  planowanie:[
+    {icon:'🎯',title:'Śpisz, mózg planuje!',text:'W czasie snu hipokamp przetwarza cele zapisane wieczorem i wzmacnia ich ślady pamięciowe. Jutro wstaniesz gotowy.'},
+    {icon:'🎯',title:'Mniej decyzji rano!',text:'Planowanie wieczorem eliminuje zmęczenie decyzyjne z rana — Twoja wola działania jest wtedy najsilniejsza.'},
+    {icon:'🎯',title:'Priorytety działają!',text:'Zapisanie 2-3 priorytetów wieczorem sprawia, że realizujesz o 26% więcej ważnych zadań następnego dnia.'},
+    {icon:'🎯',title:'Lęk przed jutrem znika!',text:'Zapisanie planu przenosi odpowiedzialność z głowy na papier. Ciało migdałowate uspokaja się — śpisz lepiej.'},
+    {icon:'🎯',title:'Poczucie kontroli!',text:'Sam akt planowania podnosi poziom serotoniny. Czujesz, że masz życie w rękach — bo tak jest.'},
+  ],
+  wdziecznosc:[
+    {icon:'🙏',title:'Więcej dopaminy!',text:'Zapisanie 5 rzeczy, za które jesteś wdzięczny, aktywuje układ nagrody w mózgu — tak samo jak jedzenie czy sport.'},
+    {icon:'🙏',title:'Kortyzol spada!',text:'Regularna praktyka wdzięczności obniża kortyzol o ok. 23%. Twój układ nerwowy dosłownie się uspokaja.'},
+    {icon:'🙏',title:'Silniejsze relacje!',text:'Osoby praktykujące wdzięczność częściej wyrażają uznanie innym, co buduje głębsze i trwalsze relacje.'},
+    {icon:'🙏',title:'Mózg szuka dobrego!',text:'Po tygodniach praktyki mózg zaczyna automatycznie i szybciej zauważać pozytywne zdarzenia — dosłownie przeprogramowujesz percepcję na lepszą.'},
+    {icon:'🙏',title:'Lepszy nastrój na jutro!',text:'Wieczorna wdzięczność podnosi nastrój następnego poranka bardziej niż jakakolwiek inna poranna rutyna. Efekt trwa do 14 godzin.'},
+  ],
+  wydatki:[
+    {icon:'💳',title:'Świadomość = oszczędności!',text:'Sama świadomość wydatków — bez żadnego budżetu — sprawia, że ludzie automatycznie wydają mniej.'},
+    {icon:'💳',title:'Koniec z impulsami!',text:'Osoby śledzące wydatki robią o 31% mniej niezaplanowanych zakupów. Zapis działa jak chwila refleksji.'},
+    {icon:'💳',title:'Widzisz wzorce!',text:'Po 30 dniach logowania większość ludzi odkrywa 1-2 kategorie, gdzie marnuje pieniądze, o których nie wiedziała.'},
+    {icon:'💳',title:'Stres finansowy spada!',text:'Osoby śledzące finanse codziennie rzadziej budzą się w nocy z myślami o pieniądzach. Kontrola uspokaja.'},
+    {icon:'💳',title:'Pełny obraz roku!',text:'Logowanie wydatków przez rok pokazuje dokładnie, gdzie trafiło 100% Twoich pieniędzy. Tego nie da Ci żaden bank.'},
+  ],
+  scroll:[
+    {icon:'🚫',title:'Koncentracja wraca!',text:'Po 30 minutach bez scrollowania kora przedczołowa odzyskuje zdolność do głębokiego myślenia. Właśnie jej dałeś szansę.'},
+    {icon:'🚫',title:'Dopamina w równowadze!',text:'Nieskończony scroll zaprojektowano tak, żeby nigdy nie czuć zaspokojenia — jak automat do gier. Dziś odcięłeś tę pętlę.'},
+    {icon:'🚫',title:'Bez toksycznych porównań!',text:'Social media aktywują obszary odpowiedzialne za porównania społeczne, co podwyższa lęk. Dziś tego uniknąłeś.'},
+    {icon:'🚫',title:'Czas dla Ciebie!',text:'Przeciętny użytkownik scrolluje 2h 27min dziennie. Każdy dzień bez tego to czas na coś, co naprawdę budujesz.'},
+    {icon:'🚫',title:'Lepszy sen!',text:'Scrollowanie przed snem skraca fazę REM nawet o 40 minut — tę, w której mózg konsoliduje pamięć i reguluje emocje.'},
+  ],
+  jezyk:[
+    {icon:'🗣️',title:'Nowe połączenia!',text:'Nauka języka angażuje jednocześnie słuch, mowę, pamięć i planowanie — to jeden z najlepszych treningów mózgu.'},
+    {icon:'🗣️',title:'Lepsza wielozadaniowość!',text:'Osoby dwujęzyczne lepiej przełączają uwagę i filtrują rozpraszacze, bo mózg codziennie wybiera właściwy język.'},
+    {icon:'🗣️',title:'Demencja? Nie tak szybko!',text:'Osoby znające dwa języki zachowują sprawność poznawczą średnio o 4-5 lat dłużej niż jednojęzyczne.'},
+    {icon:'🗣️',title:'Gramatyka = logika!',text:'Nauka struktur obcego języka wzmacnia myślenie analityczne i rozumienie złożonych schematów — nawet w pracy.'},
+    {icon:'🗣️',title:'Pamięć się rozciąga!',text:'Nauka słówek trenuje pamięć epizodyczną i semantyczną jednocześnie. To jak siłownia dla hipokampu.'},
+  ],
+  ai:[
+    {icon:'🤖',title:'Kompetencja przyszłości!',text:'Umiejętność pracy z AI to dziś narzędzie jak Excel w latach 90. Ci, którzy opanują je wcześnie, mają trwałą przewagę.'},
+    {icon:'🤖',title:'Lepsze pytania, lepsze wyniki!',text:'Praca z modelami językowymi poprawia umiejętność formułowania pytań i strukturyzowania problemów w każdej dziedzinie.'},
+    {icon:'🤖',title:'Automatyzacja pracuje dla Ciebie!',text:'Osoby dobrze znające AI delegują powtarzalne zadania i skupiają się na pracy koncepcyjnej, którą ludzie robią najlepiej.'},
+    {icon:'🤖',title:'Uczysz się uczyć!',text:'Nauka AI to nauka nowego sposobu myślenia o problemach. Sam proces robi Cię lepszym w rozwiązywaniu nowych wyzwań.'},
+    {icon:'🤖',title:'Rynek pracy się zmienia!',text:'Najszybciej rosnące zarobki łączą wiedzę ekspercką z umiejętnościami AI. Właśnie to budujesz każdego dnia.'},
+  ],
+  gotowanie:[
+    {icon:'🍳',title:'Wiesz co jesz!',text:'Gotując samodzielnie masz pełną kontrolę nad składnikami. Restauracje dodają średnio 2x więcej soli i tłuszczu niż myślisz.'},
+    {icon:'🍳',title:'Mniej kalorii, więcej sytości!',text:'Domowe posiłki mają przeciętnie o 40% mniej kalorii niż restauracyjne odpowiedniki tej samej potrawy.'},
+    {icon:'🍳',title:'Mikrobiom Ci dziękuje!',text:'Gotowanie ze świeżych składników dostarcza błonnika i fitochemikaliów, które odżywiają bakterie jelitowe kluczowe dla odporności.'},
+    {icon:'🍳',title:'Medytacja w działaniu!',text:'Gotowanie angażuje wszystkie zmysły i wymaga skupienia — obniża lęk równie skutecznie co krótka medytacja.'},
+    {icon:'🍳',title:'Oszczędności realne!',text:'Gotowanie w domu jest 5-6x tańsze niż jedzenie na mieście. Przy codziennym gotowaniu to tysiące złotych rocznie.'},
+  ],
+};
+
+function showMotiv(day,hid){
+  const arr=MOTIV[hid];
+  if(!arr||!arr.length)return;
+  const m=arr[day % arr.length];
+  if(!m)return;
+  // Remove any existing toast for this habit
+  const existing=document.getElementById('mt-'+day+'-'+hid);
+  if(existing){
+    if(existing.classList.contains('show')){existing.remove();return;}
+    existing.remove();
+  }
+  // Find the habit row and inject toast after it
+  const row=document.getElementById('r-'+day+'-'+hid);
+  if(!row)return;
+  const toast=document.createElement('div');
+  toast.id='mt-'+day+'-'+hid;
+  toast.className='mtoast show';
+  toast.innerHTML='<div class="mtoast-icon">'+m.icon+'</div><div class="mtoast-body"><div class="mtoast-title">'+m.title+'</div><div class="mtoast-text">'+m.text+'</div></div>';
+  // Insert after the row's parent container
+  const parent=row.parentNode;
+  if(parent&&parent.parentNode){
+    parent.parentNode.insertBefore(toast,parent.nextSibling);
+  } else {
+    row.parentNode.insertBefore(toast,row.nextSibling);
+  }
+  // Toast stays until clicked
+  toast.style.cursor='pointer';
+  toast.onclick=()=>toast.remove();
+}
+
+// ── FX ──
+function spP(el){
+  const r=el.getBoundingClientRect();
+  const cs=['rgba(255,69,0,.9)','rgba(255,180,0,.9)','rgba(255,100,0,.9)','rgba(192,0,42,.8)'];
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='particle';
+    const sz=Math.random()*7+3;
+    p.style.cssText=`background:${cs[i%cs.length]};width:${sz}px;height:${sz}px;left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;--tx:${(Math.random()-.5)*120}px;--ty:${-(Math.random()*80+20)}px`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),900);
+  }
+}
+function spX(el,xp){const r=el.getBoundingClientRect();const f=document.createElement('div');f.className='xpf';f.textContent=`+${xp} XP`;f.style.cssText=`left:${r.left+r.width/2-22}px;top:${r.top+8}px`;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
+function addR(el,e){const r=el.getBoundingClientRect();const rp=document.createElement('div');rp.className='ripple';const sz=Math.max(r.width,r.height)*2;rp.style.cssText=`width:${sz}px;height:${sz}px;left:${(e?.clientX??r.left+r.width/2)-r.left-sz/2}px;top:${(e?.clientY??r.top+r.height/2)-r.top-sz/2}px`;el.appendChild(rp);setTimeout(()=>rp.remove(),500);}
+
+// ── TOGGLE HABIT ──
+function togH(day,hid,xpv,e){
+  const dd=gdd(day),nv=!dd[hid];
+  sdd(day,hid,nv);
+  const row=document.getElementById(`r-${day}-${hid}`);
+  if(!row)return;
+  row.classList.toggle('done',nv);
+  if(nv){
+    spP(row);spX(row,xpv);addR(row,e);
+    if(SFX[hid])SFX[hid]();else SFX.woda();
+    showMotiv(day,hid);
+  } else SFX.undo();
+  updMR(day);updStats();
+}
+
+// Separate toggle for hero habits
+function togHero(day,hid,xpv,e){
+  e.stopPropagation();
+  togH(day,hid,xpv,e);
+  const hero=document.getElementById(`hero-${day}-${hid}`);
+  if(hero)hero.classList.toggle('done',gdd(day)[hid]);
+}
+
+// ── NOTES ──
+let noteTimers={};
+function onNoteInput(day,hid,ta){
+  const key=`${day}_${hid}`;
+  const savedEl=document.getElementById(`ns-${day}-${hid}`);
+  if(savedEl){savedEl.textContent='zapisuję…';savedEl.classList.remove('flash');}
+  clearTimeout(noteTimers[key]);
+  noteTimers[key]=setTimeout(()=>{
+    setNote(day,hid,ta.value);
+    const nb=document.getElementById(`nb-${day}-${hid}`);
+    if(nb)nb.classList.toggle('has-notes',ta.value.length>0);
+    if(savedEl){savedEl.textContent='Zapisano ✓';savedEl.classList.add('flash');setTimeout(()=>{savedEl.textContent='Autosave';savedEl.classList.remove('flash');},2000);}
+  },800);
+}
+
+function togNotePanel(day,hid,e){
+  if(e)e.stopPropagation();
+  const panel=document.getElementById(`np-${day}-${hid}`);
+  const btn=document.getElementById(`nb-${day}-${hid}`);
+  if(!panel)return;
+  const opening=!panel.classList.contains('open');
+  panel.classList.toggle('open',opening);
+  if(btn)btn.classList.toggle('open',opening);
+  if(opening)setTimeout(()=>{const ta=document.getElementById(`nt-${day}-${hid}`);if(ta)ta.focus();},360);
+}
+
+function noteBtn(day,hid){
+  const note=getNote(day,hid);
+  const has=note.length>0;
+  return `<div class="notes-btn${has?' has-notes':''}" id="nb-${day}-${hid}" onclick="togNotePanel('${day}','${hid}',event)">📝<div class="nb-dot"></div></div>`;
+}
+
+function notePanel(day,hid,placeholder='Dodaj notatkę...'){
+  const note=getNote(day,hid);
+  const esc=note.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return `<div class="notes-panel" id="np-${day}-${hid}">
+    <div class="notes-inner">
+      <div class="notes-header"><span class="notes-icon">📝</span><span class="notes-title">Notatka</span></div>
+      <textarea class="notes-area" id="nt-${day}-${hid}" placeholder="${placeholder}" oninput="onNoteInput('${day}','${hid}',this)">${esc}</textarea>
+      <div class="notes-footer"><span class="notes-saved" id="ns-${day}-${hid}">Autosave</span><span class="notes-hint">zapisuje automatycznie</span></div>
+    </div>
+  </div>`;
+}
+
+// ── PRIORITIES ──
+let prioTimers={};
+function onPrioInput(day,k,input){
+  clearTimeout(prioTimers[`${day}_${k}`]);
+  prioTimers[`${day}_${k}`]=setTimeout(()=>{
+    setPrio(day,k,input.value);
+    const s=document.getElementById(`ps-saved-${day}`);
+    if(s){s.textContent='Zapisano ✓';s.classList.add('flash');setTimeout(()=>{s.textContent='Autosave';s.classList.remove('flash');},2000);}
+  },600);
+}
+
+function renderPrioBanner(){
+  // This top banner is no longer used — priorities are shown per-day inside rBody
+  return '';
+}
+
+// ── TABS ──
+function swTab(t,btn){
+  ctab=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function render(){
+  if(ctab==='days')rDays();
+  else if(ctab==='expenses')rExpenses();
+  else if(ctab==='recipes')rRecipes();
+  else rSum();
+}
+
+// ── RENDER DAYS ──
+function rDays(){
+  const mc=document.getElementById('MC');
+  const n=gdim(cy,cm),fd=(cy===2026&&cm===2)?SD:1;
+  let h=renderPrioBanner();
+  for(let day=fd;day<=n;day++){
+    const dow=gdow(cy,cm,day);
+    const{done,max}=cs(day);
+    const pct=max>0?Math.round(done/max*100):0;
+    const ad=done===max&&max>0;
+    const off=63-(pct/100*63);
+    const col=pct===100?'url(#g2)':pct>=50?'url(#g1)':'url(#g3)';
+    h+=`<div class="day-section${isT(day)?' today':''}${ad?' all-done':''}" id="s-${day}">
+      <div class="dhdr" onclick="togDay(${day})">
+        <div class="dnum"><div class="dnv">${String(day).padStart(2,'0')}</div><div class="dnd">${DSH[dow]}</div></div>
+        <div class="dinf"><div class="dname">${DPL[dow]}</div><div class="dsub">${getHabitSummary(dow)}</div></div>
+        <div class="dprog"><div class="mring"><svg class="mrsvg" viewBox="0 0 28 28"><circle class="mrbg" cx="14" cy="14" r="10"/><circle class="mrf" id="mr-${day}" cx="14" cy="14" r="10" stroke="${col}" style="stroke-dashoffset:${off}"/></svg></div><span class="mpct">${pct>0?pct+'%':'—'}</span></div>
+      </div>
+      <div class="dbody" id="db-${day}">${rBody(day,dow)}</div>
+    </div>`;
+  }
+  mc.innerHTML=h;updStats();
+}
+
+function getHabitSummary(dow){
+  const cond=COND_HABITS.filter(h=>h.days.includes(dow));
+  return cond.length?cond.map(h=>h.name).join(', '):'Tylko nawyki dzienne';
+}
+
+function rBody(day,dow){
+  const dd=gdd(day);
+  const{daily,cond}=getHabitsForDow(dow);
+  const prios=getPrios(day);
+  let h='';
+
+  // Show priorities entered the DAY BEFORE (day-1) as "today's priorities"
+  const prevPrios=getPrevDayPrios(day);
+  if(prevPrios.prio1||prevPrios.prio2){
+    h+=`<div class="priorities-banner" style="margin-bottom:8px">
+      <div class="pb-label">🎯 Priorytety na dziś</div>
+      ${prevPrios.prio1?`<div class="pb-item"><div class="pb-num">1</div><span>${prevPrios.prio1}</span></div>`:''}
+      ${prevPrios.prio2?`<div class="pb-item"><div class="pb-num">2</div><span>${prevPrios.prio2}</span></div>`:''}
+    </div>`;
+  }
+
+  // DAILY HABITS as cards
+  daily.forEach(hb=>{
+    const ck=dd[hb.id];
+    const note=getNote(day,hb.id);
+    const hasNote=note.length>0;
+    h+=`<div class="hlist" style="margin-bottom:0;border-radius:0;border-bottom:none;">
+      <div class="hrow${ck?' done':''}" id="r-${day}-${hb.id}" onclick="togH(${day},'${hb.id}',${hb.xp},event)">
+        <div class="hrow-icon ${hb.ic}">${hb.icon}</div>
+        <div class="hrow-text"><div class="hrow-name">${hb.name}</div><div class="hrow-desc">${hb.desc}</div></div>
+        <div class="hrow-right">
+          <div class="hrow-xp">+${hb.xp}&thinsp;XP</div>
+          <div class="row-note-btn${hasNote?' has-notes':''}" id="nb-${day}-${hb.id}" onclick="togNotePanel('${day}','${hb.id}',event)">📝<div class="nb-dot"></div></div>
+          <div class="hrow-toggle"><svg class="chksvg" width="12" height="12" viewBox="0 0 14 14"><polyline class="hrow-check" points="2,7.5 5.5,11 12,3.5"/></svg></div>
+        </div>
+      </div>
+    </div>
+    ${notePanel(day,hb.id,'Dodaj notatkę do nawyku...')}`;
+  });
+  h+=`<div style="margin-bottom:8px"></div>`;
+
+  // CONDITIONAL HABITS
+  if(cond.length){
+    cond.forEach(hb=>{
+      const ck=dd[hb.id];
+      const note=getNote(day,hb.id);
+      const hasNote=note.length>0;
+      h+=`<div class="hlist" style="margin-bottom:0;border-radius:0;border-bottom:none;">
+        <div class="hrow${ck?' done':''}" id="r-${day}-${hb.id}" onclick="togH(${day},'${hb.id}',${hb.xp},event)">
+          <div class="hrow-icon ${hb.ic}">${hb.icon}</div>
+          <div class="hrow-text"><div class="hrow-name">${hb.name}</div><div class="hrow-desc">${hb.desc}</div></div>
+          <div class="hrow-right">
+            <div class="hrow-xp">+${hb.xp}&thinsp;XP</div>
+            <div class="row-note-btn${hasNote?' has-notes':''}" id="nb-${day}-${hb.id}" onclick="togNotePanel('${day}','${hb.id}',event)">📝<div class="nb-dot"></div></div>
+            <div class="hrow-toggle"><svg class="chksvg" width="12" height="12" viewBox="0 0 14 14"><polyline class="hrow-check" points="2,7.5 5.5,11 12,3.5"/></svg></div>
+          </div>
+        </div>
+      </div>
+      ${notePanel(day,hb.id,'Dodaj notatkę...')}`;
+    });
+    h+=`<div style="margin-bottom:8px"></div>`;
+  }
+
+  // PRIORITIES INPUT
+  h+=`<div class="priorities-section">
+    <div class="ps-label">🎯 Priorytety na jutro</div>
+    <div class="ps-input-row"><div class="ps-num">1</div><input class="ps-input" type="text" placeholder="Priorytet #1..." value="${esc(prios.prio1||'')}" oninput="onPrioInput(${day},'prio1',this)"></div>
+    <div class="ps-input-row"><div class="ps-num">2</div><input class="ps-input" type="text" placeholder="Priorytet #2..." value="${esc(prios.prio2||'')}" oninput="onPrioInput(${day},'prio2',this)"></div>
+    <div class="ps-saved" id="ps-saved-${day}">Autosave</div>
+  </div>`;
+
+  return h;
+}
+
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// ── UPDATE MINI RING ──
+function updMR(day){
+  const{done,max}=cs(day);const pct=max>0?Math.round(done/max*100):0;
+  const wasComplete=document.getElementById(`s-${day}`)?.classList.contains('all-done');
+  const off=63-(pct/100*63);
+  const mr=document.getElementById(`mr-${day}`);
+  if(mr){mr.style.strokeDashoffset=off;mr.setAttribute('stroke',pct===100?'url(#g2)':pct>=50?'url(#g1)':'url(#g3)');}
+  const nowComplete=done===max&&max>0;
+  document.getElementById(`s-${day}`)?.classList.toggle('all-done',nowComplete);
+  const mp=document.querySelector(`#s-${day} .mpct`);
+  if(mp)mp.textContent=pct>0?pct+'%':'—';
+  if(nowComplete&&!wasComplete)SFX.complete();
+}
+
+function togDay(day){document.getElementById(`db-${day}`).classList.toggle('open');}
+
+// ── UPDATE STATS ──
+function updStats(){
+  const n=gdim(cy,cm),fd=(cy===2026&&cm===2)?SD:1;
+  let tp=0,pc=0;
+  for(let d=fd;d<=n;d++){const{done,max}=cs(d);if(max>0){tp+=done/max;pc++;}}
+  const avg=pc>0?Math.round(tp/pc*100):0;
+  const streak=cStreak(),xp=cXP(),lv=gLv(xp);
+  const prog=Math.min(100,((xp-lv.min)/(lv.max-lv.min))*100);
+  const todayDone=cs(today.getDate()).done;
+
+  document.getElementById('sTr').textContent=streak;
+  document.getElementById('rTrN').textContent=streak;
+  document.getElementById('rTr').style.strokeDashoffset=100-Math.min(100,streak/21*100);
+  document.getElementById('sSt').textContent=todayDone;
+  document.getElementById('rStN').textContent=todayDone;
+  document.getElementById('rSt').style.strokeDashoffset=100-Math.min(100,todayDone/10*100);
+  document.getElementById('sPct').textContent=avg+'%';
+  document.getElementById('rPctN').textContent=avg+'%';
+  document.getElementById('rPct').style.strokeDashoffset=100-avg;
+  document.getElementById('xpfill').style.width=prog+'%';
+  document.getElementById('xplv').textContent=lv.n;
+  document.getElementById('xpcur').textContent=xp;
+  document.getElementById('xpmax').textContent=lv.max;
+  document.getElementById('xcv').textContent=xp+' XP';
+  document.getElementById('xcl').textContent='· LVL '+(LVS.indexOf(lv)+1);
+}
+
+function goToday(){
+  if(ctab!=='days'){swTab('days',document.querySelector('.tab'));return;}
+  const el=document.getElementById(`s-${today.getDate()}`);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});const b=document.getElementById(`db-${today.getDate()}`);if(b&&!b.classList.contains('open'))b.classList.add('open');}
+}
+
+// ── EXPENSES ──
+let expFilter='all';
+function rExpenses(){
+  const mc=document.getElementById('MC');
+  const exps=ldE();
+  const todayStr=`${cy}-${cm}-${today.getDate()}`;
+  const filtered=expFilter==='all'?exps:exps.filter(e=>e.cat===expFilter);
+  const total=filtered.reduce((s,e)=>s+e.amt,0);
+
+  // Category totals
+  const catTotals={};
+  exps.forEach(e=>{catTotals[e.cat]=(catTotals[e.cat]||0)+e.amt;});
+
+  let catFilters=`<div class="recipe-filters"><button class="rf-btn${expFilter==='all'?' active':''}" onclick="setExpFilter('all')">Wszystkie</button>`;
+  EXP_CATS.forEach(c=>{catFilters+=`<button class="rf-btn${expFilter===c.id?' active':''}" onclick="setExpFilter('${c.id}')">${c.label}</button>`;});
+  catFilters+=`</div>`;
+
+  let itemsHtml=filtered.length?filtered.map((e,i)=>{
+    const cat=EXP_CATS.find(c=>c.id===e.cat)||EXP_CATS[7];
+    return`<div class="exp-item">
+      <div class="exp-cat-dot" style="background:${cat.color}"></div>
+      <div class="exp-item-text"><div class="exp-item-name">${esc(e.name)}</div><div class="exp-item-cat">${cat.label} · ${e.date}</div></div>
+      <div class="exp-item-amt">${e.amt.toFixed(2)} zł</div>
+      <div class="exp-item-del" onclick="delExp(${exps.indexOf(e)})">✕</div>
+    </div>`;
+  }).join(''):
+  `<div class="exp-empty">Brak wydatków. Dodaj pierwszy! 💳</div>`;
+
+  let catBreak='<div class="cat-breakdown">';
+  EXP_CATS.forEach(c=>{if(catTotals[c.id]){catBreak+=`<div class="cat-chip"><div class="cat-chip-dot" style="background:${c.color}"></div><span class="cat-chip-label">${c.label}</span><span class="cat-chip-val">${catTotals[c.id].toFixed(0)} zł</span></div>`;}});
+  catBreak+='</div>';
+
+  mc.innerHTML=`<div class="exp-wrap">
+    <div class="exp-add-card">
+      <div class="slbl">➕ Dodaj wydatek</div>
+      <div class="exp-form">
+        <input class="exp-input" id="expName" type="text" placeholder="Nazwa wydatku...">
+        <div class="exp-row">
+          <input class="exp-input" id="expAmt" type="number" placeholder="Kwota (zł)" step="0.01" min="0">
+          <select class="exp-select" id="expCat">
+            ${EXP_CATS.map(c=>`<option value="${c.id}">${c.label}</option>`).join('')}
+          </select>
+        </div>
+        <button class="exp-add-btn" onclick="addExp()">Dodaj wydatek 🔥</button>
+      </div>
+    </div>
+    ${catFilters}
+    <div class="exp-list-card">
+      <div class="exp-list-header">
+        <div><div class="exp-total">${total.toFixed(2)} zł</div><div class="exp-total-label">${expFilter==='all'?'Łącznie':'Kategoria: '+EXP_CATS.find(c=>c.id===expFilter)?.label}</div></div>
+      </div>
+      ${itemsHtml}
+      ${Object.keys(catTotals).length?catBreak:''}
+    </div>
+  </div>`;
+}
+
+function setExpFilter(f){expFilter=f;rExpenses();}
+
+function addExp(){
+  const name=document.getElementById('expName').value.trim();
+  const amt=parseFloat(document.getElementById('expAmt').value);
+  const cat=document.getElementById('expCat').value;
+  if(!name||isNaN(amt)||amt<=0)return;
+  const exps=ldE();
+  const d=today;
+  exps.unshift({name,amt,cat,date:`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`});
+  svE(exps);
+  document.getElementById('expName').value='';
+  document.getElementById('expAmt').value='';
+  rExpenses();
+  SFX.habit();
+}
+
+function delExp(i){
+  const exps=ldE();exps.splice(i,1);svE(exps);rExpenses();SFX.undo();
+}
+
+// ── RECIPES ──
+const RECIPES=[
+  {id:'r1',name:'Owsianka z bananem',icon:'🥣',cat:'sniadanie',time:10,kcal:380,p:14,w:60,t:8,
+   ing:['100g płatków owsianych','1 banan','200ml mleka','1 łyżka miodu','garść orzechów'],
+   steps:['Zagotuj mleko w garnku.','Wsyp płatki owsiane, gotuj 5 minut mieszając.','Dodaj pokrojonego banana i miód.','Posyp orzechami i podawaj.']},
+  {id:'r2',name:'Jajka sadzone z warzywami',icon:'🍳',cat:'sniadanie',time:12,kcal:290,p:18,w:10,t:20,
+   ing:['3 jajka','1 pomidor','1/2 papryki','łyżka oliwy','sól, pieprz','oregano'],
+   steps:['Rozgrzej patelnię z oliwą.','Podsmaż pokrojoną paprykę 2 min.','Dodaj pomidora, smaż 1 min.','Wbij jajka, przykryj i gotuj 3-4 min.','Dopraw i podawaj.']},
+  {id:'r3',name:'Kurczak z ryżem i brokułem',icon:'🍗',cat:'obiad',time:35,kcal:520,p:42,w:55,t:9,
+   ing:['200g piersi kurczaka','150g ryżu','200g brokułu','łyżka oliwy','czosnek','sól, pieprz','papryka słodka'],
+   steps:['Ugotuj ryż wg instrukcji.','Kurczaka pokrój, dopraw papryką, solą i pieprzem.','Rozgrzej oliwę, podsmaż czosnek 30s.','Dodaj kurczaka, smaż 6-8 min każdą stronę.','Ugotuj brokuł na parze 5 min.','Podawaj razem.']},
+  {id:'r4',name:'Makaron z łososiem',icon:'🍝',cat:'obiad',time:25,kcal:580,p:36,w:62,t:16,
+   ing:['150g makaronu penne','200g fileta z łososia','100ml śmietanki 18%','koperek','czosnek','cytryna','sól, pieprz'],
+   steps:['Ugotuj makaron al dente.','Łososia pokrój w kostki, dopraw solą i pieprzem.','Na patelni zeszklij czosnek, dodaj łososia, smaż 4 min.','Wlej śmietankę, gotuj 3 min.','Wymieszaj z makaronem, dodaj koperek i skórkę z cytryny.']},
+  {id:'r5',name:'Sałatka z tuńczykiem',icon:'🥗',cat:'kolacja',time:8,kcal:310,p:28,w:15,t:14,
+   ing:['1 puszka tuńczyka','2 jajka','sałata','ogórek','pomidor','1 łyżka majonezu light','musztarda'],
+   steps:['Ugotuj jajka na twardo (10 min).','Odsącz tuńczyka.','Umyj i posiekaj warzywa.','Przygotuj sos z majonezu i musztardy.','Wymieszaj wszystko, dodaj ćwiartki jajek.']},
+  {id:'r6',name:'Smoothie białkowe',icon:'🥤',cat:'sniadanie',time:5,kcal:340,p:30,w:35,t:5,
+   ing:['30g białka serwatkowego','1 banan','200ml mleka migdałowego','garść szpinaku','lód','1 łyżka masła orzechowego'],
+   steps:['Wrzuć wszystkie składniki do blendera.','Blenduj 45 sekund do uzyskania jednolitej konsystencji.','Przelej do szklanki i podawaj natychmiast.']},
+  {id:'r7',name:'Zupa pomidorowa',icon:'🍅',cat:'obiad',time:30,kcal:220,p:8,w:32,t:6,
+   ing:['800g pomidorów z puszki','1 cebula','3 ząbki czosnku','500ml bulionu','100ml śmietanki','bazylia','oliwa','sól, pieprz'],
+   steps:['Zeszklij cebulę i czosnek na oliwie 5 min.','Dodaj pomidory i bulion.','Gotuj 20 minut.','Zblenduj na krem.','Dodaj śmietankę, dopraw, posyp bazylią.']},
+  {id:'r8',name:'Ryba pieczona z ziemniakami',icon:'🐟',cat:'obiad',time:45,kcal:480,p:38,w:48,t:10,
+   ing:['250g dorsza','400g ziemniaków','2 łyżki oliwy','cytryna','koper','sól, pieprz','rozmaryn'],
+   steps:['Nagrzej piekarnik do 200°C.','Ziemniaki pokrój w plastry, skrop oliwą, dopraw.','Piecz ziemniaki 20 min.','Rybę dopraw sokiem z cytryny, solą i koprem.','Dodaj do ziemniaków, piecz kolejne 15-18 min.']},
+  {id:'r9',name:'Naleśniki proteinowe',icon:'🥞',cat:'sniadanie',time:20,kcal:420,p:32,w:48,t:10,
+   ing:['3 jajka','100g twarogu','2 łyżki płatków owsianych','1/2 banana','szczypta soli','olej kokosowy'],
+   steps:['Zblenduj wszystkie składniki do gładkiej masy.','Rozgrzej patelnię z olejem kokosowym.','Smaż naleśniki po 2-3 min z każdej strony.','Podawaj z jogurtem i owocami.']},
+  {id:'r10',name:'Gulasz wołowy',icon:'🍲',cat:'obiad',time:90,kcal:560,p:45,w:30,t:25,
+   ing:['400g wołowiny','2 cebule','3 marchewki','papryka czerwona','puszka pomidorów','bulion wołowy','papryka słodka i wędzona','tymianek'],
+   steps:['Wołowinę pokrój i obsmaż na złoto.','Dodaj cebulę, marchew i paprykę, smaż 5 min.','Wlej bulion i pomidory.','Gotuj pod przykryciem 60-70 min na małym ogniu.','Dopraw przyprawami do smaku.']},
+  {id:'r11',name:'Sałatka grecka',icon:'🧀',cat:'kolacja',time:10,kcal:280,p:12,w:14,t:20,
+   ing:['200g sera feta','2 pomidory','1 ogórek','pół czerwonej cebuli','oliwki','oliwa','oregano'],
+   steps:['Pokrój wszystkie warzywa w dużą kostkę.','Ser feta pokrój lub pokrusz.','Wymieszaj warzywa, dodaj oliwki.','Skrop oliwą, posyp oregano.','Podawaj od razu.']},
+  {id:'r12',name:'Wok z warzywami i tofu',icon:'🥢',cat:'obiad',time:20,kcal:350,p:22,w:30,t:14,
+   ing:['250g tofu twardego','1 cukinia','1 papryka','1 marchew','bok choy','3 łyżki sosu sojowego','imbir','czosnek','sezam'],
+   steps:['Tofu pokrój, obsmaż do złota.','Na woku rozgrzej olej, dodaj czosnek i imbir.','Wrzuć warzywa, smaż 5-7 min na dużym ogniu.','Dodaj tofu i sos sojowy.','Posyp sezamem i podawaj.']},
+  {id:'r13',name:'Zupa krem z dyni',icon:'🎃',cat:'obiad',time:40,kcal:240,p:5,w:35,t:9,
+   ing:['700g dyni Hokkaido','1 cebula','500ml bulionu','200ml mleka kokosowego','imbir','kurkuma','oliwa'],
+   steps:['Dynię pokrój, skrop oliwą, piecz 25 min w 200°C.','Zeszklij cebulę z imbirem.','Dodaj pieczoną dynię i bulion.','Gotuj 10 min, zblenduj.','Dodaj mleko kokosowe i kurkumę, dopraw.']},
+  {id:'r14',name:'Omlet z serem i szpinakiem',icon:'🧆',cat:'sniadanie',time:10,kcal:380,p:28,w:6,t:26,
+   ing:['3 jajka','50g sera żółtego','garść szpinaku','łyżka masła','sól, pieprz','gałka muszkatołowa'],
+   steps:['Rozbij jajka, dopraw solą i pieprzem.','Rozgrzej masło na patelni.','Wlej jajka, smażą na małym ogniu.','Gdy prawie ścięte — dodaj szpinak i ser.','Złóż omlet na pół.']},
+  {id:'r15',name:'Krewetki z czosnkiem',icon:'🦐',cat:'kolacja',time:15,kcal:290,p:30,w:8,t:14,
+   ing:['300g krewetek','4 ząbki czosnku','masło','pietruszka','chili','cytryna','sól'],
+   steps:['Krewetki rozmróź i osusz.','Rozgrzej masło, zeszklij czosnek z chili.','Dodaj krewetki, smaż 2-3 min z każdej strony.','Skrop sokiem z cytryny, posyp pietruszką.','Podawaj natychmiast.']},
+  {id:'r16',name:'Risotto z grzybami',icon:'🍄',cat:'obiad',time:35,kcal:490,p:12,w:72,t:14,
+   ing:['300g ryżu arborio','400g pieczarek','1 cebula','100ml białego wina','800ml bulionu','parmezan','masło','tymianek'],
+   steps:['Podsmaż cebulę na maśle.','Dodaj ryż, smaż 2 min.','Wlej wino, odparuj.','Dodawaj bulion chochlą co kilka minut mieszając.','Po 20 min ryż powinien być kremowy.','Wmieszaj masło i parmezan.']},
+  {id:'r17',name:'Kanapki z jajkiem i awokado',icon:'🥑',cat:'sniadanie',time:10,kcal:420,p:20,w:30,t:22,
+   ing:['2 jajka','1 awokado','2 kromki chleba pełnoziarnistego','sól morska','pieprz','sok z cytryny','chili w płatkach'],
+   steps:['Ugotuj jajka na miękko (6 min).','Awokado rozgnieć widelcem, dopraw solą i cytryną.','Opiecz chleb.','Nałóż awokado na kanapki.','Obierz jajka, połóż na górze, posyp chili.']},
+  {id:'r18',name:'Pierś kurczaka z pesto',icon:'🌿',cat:'kolacja',time:20,kcal:450,p:46,w:8,t:24,
+   ing:['2 piersi kurczaka','4 łyżki pesto bazyliowego','100g pomidorków cherry','ser mozzarella','oliwa','sól, pieprz'],
+   steps:['Kurczaka rozbij, dopraw.','Posmaruj pesto z obu stron.','Smaż na oliwie 5-6 min z każdej strony.','Na ostatnią minutę dodaj mozzarellę.','Podawaj z pomidorkami.']},
+  {id:'r19',name:'Burrito z fasolą',icon:'🌯',cat:'obiad',time:20,kcal:580,p:24,w:80,t:14,
+   ing:['2 tortille','puszka fasoli','ryż','awokado','salsa','śmietana','ser cheddar','papryka w proszku','kminek'],
+   steps:['Ugotuj ryż.','Fasolę podgrzej z papryką i kminem.','Tortille podgrzej.','Nałóż ryż, fasolę, salsę i awokado.','Posyp serem, zwiń ciasno.','Podsmaż zwinięte burrito 1-2 min.']},
+  {id:'r20',name:'Zupa soczewicowa',icon:'🫘',cat:'obiad',time:35,kcal:320,p:18,w:48,t:6,
+   ing:['250g soczewicy czerwonej','1 cebula','2 marchewki','puszka pomidorów','kurkuma','kolendra','kminek','bulion'],
+   steps:['Soczewicę opłucz.','Zeszklij cebulę, dodaj marchew.','Dodaj przyprawy, smaż 30 sek.','Wrzuć soczewicę, pomidory i bulion.','Gotuj 20 min, ewentualnie zblenduj.']},
+  {id:'r21',name:'Steak wołowy',icon:'🥩',cat:'obiad',time:20,kcal:420,p:50,w:2,t:22,
+   ing:['250g antrykotu','masło','czosnek','rozmaryn','tymianek','sól morska','pieprz gruboziarnisty'],
+   steps:['Mięso wyjmij z lodówki 30 min wcześniej.','Grubo dopraw solą i pieprzem.','Smaż na mocno rozgrzanej patelni 3-4 min/stronę (medium rare).','Na ostatnią minutę dodaj masło, czosnek i zioła.','Odpocznij mięso 5 min przed krojeniem.']},
+  {id:'r22',name:'Pad Thai z kurczakiem',icon:'🍜',cat:'obiad',time:25,kcal:530,p:34,w:62,t:14,
+   ing:['200g makaronu ryżowego','200g kurczaka','2 jajka','kiełki fasoli','szczypiorek','3 łyżki sosu rybnego','łyżka sosu ostrygowego','orzeszki ziemne','limonka'],
+   steps:['Makaron namocz wg instrukcji.','Smaż kurczaka, odłóż.','Wbij jajka, mieszaj.','Dodaj makaron, sos rybny i ostrygowy.','Wymieszaj z kurczakiem i kiełkami.','Posyp orzeszkami, skrop limonką.']},
+  {id:'r23',name:'Tosty francuskie',icon:'🍞',cat:'sniadanie',time:12,kcal:390,p:18,w:45,t:14,
+   ing:['3 kromki chleba','2 jajka','50ml mleka','cukier waniliowy','masło','syrop klonowy','owoce'],
+   steps:['Jajka rozbij z mlekiem i cukrem waniliowym.','Maczaj chleb w masie jajecznej.','Smaż na maśle po 2-3 min każdą stronę.','Podawaj z syropem i owocami.']},
+  {id:'r24',name:'Curry z ciecierzycą',icon:'🍛',cat:'obiad',time:30,kcal:420,p:16,w:58,t:12,
+   ing:['2 puszki ciecierzycy','puszka mleka kokosowego','pomidory z puszki','1 cebula','czosnek','imbir','curry','garam masala','szpinak','ryż'],
+   steps:['Zeszklij cebulę z czosnkiem i imbirem.','Dodaj przyprawy, smaż 1 min.','Dodaj ciecierzycę i pomidory.','Wlej mleko kokosowe, gotuj 15 min.','Na końcu dodaj szpinak.','Podawaj z ryżem.']},
+  {id:'r25',name:'Sałatka Cezar',icon:'🥬',cat:'kolacja',time:15,kcal:350,p:20,w:22,t:20,
+   ing:['sałata rzymska','200g piersi kurczaka','grzanki','parmezan','sos Cezar','cytryna','pieprz'],
+   steps:['Kurczaka ugrilluj lub podsmaż, pokrój.','Sałatę rozerwij na liście.','Przygotuj grzanki.','Wymieszaj sałatę z sosem.','Dodaj kurczaka, grzanki i parmezan.']},
+  {id:'r26',name:'Zupa jarzynowa',icon:'🥕',cat:'obiad',time:40,kcal:180,p:7,w:28,t:4,
+   ing:['2 marchewki','2 ziemniaki','1 pietruszka','seler','por','fasolka szparagowa','bulion','natka pietruszki','sól, pieprz'],
+   steps:['Warzywa obierz i pokrój.','Zagotuj bulion.','Wrzuć warzywa wg czasu gotowania (najpierw twardsze).','Gotuj 20-25 min.','Dopraw i posyp natką.']},
+  {id:'r27',name:'Pancakes owsiane',icon:'🥞',cat:'sniadanie',time:15,kcal:360,p:16,w:52,t:8,
+   ing:['100g płatków owsianych','2 jajka','100ml mleka','1/2 banana','proszek do pieczenia','szczypta soli','olej'],
+   steps:['Zblenduj płatki na mąkę.','Wymieszaj z jajkami, mlekiem i bananem.','Dodaj proszek do pieczenia.','Smaż małe placuszki po 2 min każdą stronę.','Podawaj z owocami.']},
+  {id:'r28',name:'Łosoś z patelni',icon:'🐠',cat:'obiad',time:15,kcal:480,p:42,w:5,t:30,
+   ing:['2 filety z łososia','cytryna','koperek','masło','sól morska','pieprz cytrynowy','czosnek'],
+   steps:['Filety osusz i dopraw.','Rozgrzej patelnię do wysokiej temperatury.','Smaż skórą do dołu 4-5 min.','Odwróć, smaż 2-3 min.','Dodaj masło i czosnek, polej sosem.','Skrop cytryną i posyp koperkiem.']},
+  {id:'r29',name:'Tortellini w sosie pomidorowym',icon:'🍝',cat:'obiad',time:20,kcal:510,p:22,w:68,t:16,
+   ing:['400g tortellini z serem','puszka pomidorów','2 ząbki czosnku','bazylia','oliwa','parmezan','sól, pieprz'],
+   steps:['Ugotuj tortellini wg instrukcji.','Zeszklij czosnek na oliwie.','Dodaj pomidory, gotuj 10 min.','Dopraw bazylią, solą i pieprzem.','Wymieszaj z tortellini, posyp parmezanem.']},
+  {id:'r30',name:'Zupa krem brokułowa',icon:'🥦',cat:'obiad',time:30,kcal:200,p:10,w:20,t:9,
+   ing:['500g brokułu','1 cebula','500ml bulionu','200ml śmietanki','gałka muszkatołowa','sól, pieprz','oliwa','grzanki'],
+   steps:['Podsmaż cebulę na oliwie.','Dodaj brokuł podzielony na różyczki.','Wlej bulion, gotuj 15 min.','Zblenduj na krem.','Dodaj śmietankę, dopraw gałką.','Podawaj z grzankami.']},
+  {id:'r31',name:'Placki ziemniaczane',icon:'🥔',cat:'obiad',time:30,kcal:380,p:9,w:52,t:16,
+   ing:['600g ziemniaków','1 jajko','2 łyżki mąki','1 cebula','sól, pieprz','olej do smażenia','śmietana'],
+   steps:['Zetrzyj ziemniaki i cebulę na tarce.','Odciśnij nadmiar soku.','Dodaj jajko, mąkę, sól i pieprz.','Formuj placki i smaż do złota.','Podawaj ze śmietaną.']},
+  {id:'r32',name:'Shakshuka',icon:'🫑',cat:'sniadanie',time:20,kcal:320,p:18,w:22,t:16,
+   ing:['4 jajka','puszka pomidorów','1 cebula','1 papryka czerwona','2 ząbki czosnku','kumin','kolendra','papryka','feta'],
+   steps:['Zeszklij cebulę i paprykę.','Dodaj czosnek i przyprawy.','Wlej pomidory, gotuj 10 min.','Zrób zagłębienia, wbij jajka.','Przykryj, gotuj 8-10 min.','Posyp fetą i kolendrą.']},
+  {id:'r33',name:'Kanapka BLT',icon:'🥪',cat:'kolacja',time:8,kcal:380,p:16,w:35,t:18,
+   ing:['2 kromki chleba pełnoziarnistego','3 plastry boczku','sałata','pomidor','majonez','sól, pieprz'],
+   steps:['Boczek usmaż na chrupko.','Chleb opiecz w tosterze.','Posmaruj majonezem.','Ułóż sałatę, pomidora i boczek.','Złóż kanapkę i podawaj.']},
+  {id:'r34',name:'Polenta z grzybami',icon:'🍄',cat:'obiad',time:30,kcal:380,p:10,w:55,t:12,
+   ing:['200g kaszy kukurydzianej','400g pieczarek','100g sera','masło','bulion','czosnek','tymianek','śmietana'],
+   steps:['Ugotuj polentę w bulionie wg instrukcji.','Na końcu wmieszaj masło i ser.','Podsmaż pieczarki z czosnkiem i tymiankiem.','Dodaj łyżkę śmietany.','Podawaj polentę z grzybami na wierzchu.']},
+  {id:'r35',name:'Hummus domowy',icon:'🫙',cat:'kolacja',time:10,kcal:180,p:8,w:22,t:7,
+   ing:['puszka ciecierzycy','3 łyżki tahini','2 ząbki czosnku','sok z cytryny','oliwa','kumin','sól','woda'],
+   steps:['Odsącz ciecierzycę, zachowaj wodę z puszki.','Zblenduj ciecierzycę z czosnkiem.','Dodaj tahini, sok z cytryny i kumin.','Blenduj dodając wodę do gładkości.','Podawaj z oliwą i papryką.']},
+  {id:'r36',name:'Filet z indyka w ziołach',icon:'🦃',cat:'obiad',time:40,kcal:380,p:48,w:5,t:16,
+   ing:['400g piersi indyka','rozmaryn','tymianek','czosnek','oliwa','cytryna','sól, pieprz'],
+   steps:['Mięso natrzyj oliwą i ziołami.','Marynuj 30 min (lub przez noc).','Piecz w 180°C przez 25-30 min.','Sprawdź temperaturę wewnętrzną (74°C).','Odpocznij 5 min przed krojeniem.']},
+  {id:'r37',name:'Wrapy z warzywami',icon:'🥙',cat:'kolacja',time:10,kcal:320,p:12,w:45,t:10,
+   ing:['2 tortille','hummus','ogórek','marchew','papryka','sałata','awokado','tahini'],
+   steps:['Posmaruj tortille hummusem.','Ułóż warzywa pokrojone w julienne.','Dodaj plasterki awokado.','Skrop tahini.','Ciasno zwiń i przekrój na pół.']},
+  {id:'r38',name:'Lasagne bolognese',icon:'🍝',cat:'obiad',time:75,kcal:620,p:38,w:55,t:26,
+   ing:['500g mielonej wołowiny','płaty lasagne','sos pomidorowy','bułgarski ser','mleko','mąka','masło','parmezan'],
+   steps:['Zrób sos bolognese — smaż mięso z sosem pomidorowym 20 min.','Zrób sos béchamel z masła, mąki i mleka.','Układaj warstwy: sos, makaron, béchamel.','Powtórz 3 razy, na górę daj parmezan.','Piecz 40 min w 180°C.']},
+  {id:'r39',name:'Fasolka szparagowa z migdałami',icon:'🫘',cat:'kolacja',time:15,kcal:160,p:7,w:15,t:8,
+   ing:['400g fasolki szparagowej','garść migdałów','2 ząbki czosnku','masło','sól, pieprz','sok z cytryny'],
+   steps:['Ugotuj fasolkę al dente (5-6 min).','Na patelni zrumień migdały.','Dodaj masło i czosnek.','Wrzuć fasolkę, smaż 2 min.','Skrop cytryną i dopraw.']},
+  {id:'r40',name:'Zupa ramen',icon:'🍜',cat:'obiad',time:30,kcal:450,p:24,w:52,t:14,
+   ing:['2 porcje makaronu ramen','bulion drobiowy','2 jajka','bok choy','grzyby shiitake','sos sojowy','imbir','czosnek','sezam'],
+   steps:['Ugotuj jajka (6 min), obierz.','Gotuj bulion z imbirem i czosnkiem 15 min.','Dodaj sos sojowy, grzyby, bok choy.','Ugotuj makaron.','Złóż miski: makaron, bulion, jajko.','Posyp sezamem.']},
+  {id:'r41',name:'Placki z cukinii',icon:'🥒',cat:'kolacja',time:20,kcal:220,p:11,w:18,t:11,
+   ing:['2 cukinie','2 jajka','4 łyżki mąki','100g sera feta','koperek','sól, pieprz','oliwa'],
+   steps:['Cukinię zetrzyj, odciśnij nadmiar wody.','Wymieszaj z jajkami, mąką i fetą.','Dopraw koperkiem.','Smaż małe placki na oliwie po 3-4 min.','Podawaj z jogurtem greckim.']},
+  {id:'r42',name:'Kurczak tikka masala',icon:'🍛',cat:'obiad',time:40,kcal:490,p:38,w:30,t:22,
+   ing:['400g kurczaka','200ml sosu tikka masala','100ml jogurtu','150ml śmietanki','cebula','czosnek','imbir','ryż basmati','kolendra'],
+   steps:['Kurczaka marynuj w jogurcie i przyprawach 30 min.','Smaż marynatę cebulę z czosnkiem.','Dodaj kurczaka, obsmaż.','Wlej sos tikka i śmietankę.','Gotuj 20 min.','Podawaj z ryżem i kolendrą.']},
+  {id:'r43',name:'Omlet z pieczarkami',icon:'🍄',cat:'sniadanie',time:12,kcal:340,p:24,w:8,t:22,
+   ing:['3 jajka','200g pieczarek','1 cebula','masło','natka pietruszki','sól, pieprz'],
+   steps:['Podsmaż pieczarki z cebulą 5 min.','Jajka rozbij i dopraw.','Roztop masło na patelni.','Wlej jajka, gdy prawie ścięte dodaj pieczarki.','Złóż omlet, posyp pietruszką.']},
+  {id:'r44',name:'Spaghetti aglio e olio',icon:'🍝',cat:'kolacja',time:15,kcal:430,p:13,w:68,t:14,
+   ing:['200g spaghetti','6 ząbków czosnku','100ml oliwy extra virgin','chili','natka pietruszki','parmezan','sól'],
+   steps:['Ugotuj spaghetti al dente, zachowaj wodę z gotowania.','Na małym ogniu podgrzej oliwę z czosnkiem i chili.','Dodaj makaron i kilka łyżek wody.','Mieszaj energicznie 2 min.','Posyp pietruszką i parmezanem.']},
+  {id:'r45',name:'Kotlety mielone',icon:'🥩',cat:'obiad',time:30,kcal:460,p:32,w:18,t:28,
+   ing:['500g mielonej wieprzowiny','1 jajko','1 cebula','bułka tarta','mleko','sól, pieprz','majeranek','olej'],
+   steps:['Cebulę zetrzyj lub drobno posiekaj.','Wymieszaj mięso z jajkiem, cebulą, namoczoną bułką.','Dopraw majerankiem, solą i pieprzem.','Formuj okrągłe kotlety, panieruj w bułce.','Smaż na oleju po 4-5 min każdą stronę.']},
+  {id:'r46',name:'Zupa minestrone',icon:'🍲',cat:'obiad',time:45,kcal:260,p:11,w:40,t:6,
+   ing:['2 pomidory','cukinia','marchew','seler','por','puszka białej fasoli','bulion','makaron','bazylia','parmezan'],
+   steps:['Warzywa pokrój w kostkę.','Podsmaż twardsze warzywa 5 min.','Wlej bulion i pomidory.','Gotuj 20 min.','Dodaj fasolę i makaron, gotuj 10 min.','Posyp parmezanem i bazylią.']},
+  {id:'r47',name:'Bajgle z łososiem',icon:'🥯',cat:'sniadanie',time:8,kcal:420,p:26,w:45,t:12,
+   ing:['2 bajgle','150g wędzonego łososia','100g twarożku','ogórek','kapary','czerwona cebula','koperek','cytryna'],
+   steps:['Bajgle przekrój i opiecz.','Posmaruj twarożkiem.','Ułóż łososia.','Dodaj kapary, cebulę i ogórek.','Posyp koperkiem i skrop cytryną.']},
+  {id:'r48',name:'Polędwiczki wieprzowe w sosie śmietanowym',icon:'🥩',cat:'obiad',time:30,kcal:480,p:42,w:10,t:28,
+   ing:['400g polędwiczek','200ml śmietanki 30%','1 cebula','pieczarki','musztarda dijon','tymianek','masło','sól, pieprz'],
+   steps:['Polędwiczki pokrój w medaliony, dopraw.','Obsmaż po 2-3 min każdą stronę, odłóż.','Podsmaż cebulę z pieczarkami.','Wlej śmietankę, dodaj musztardę i tymianek.','Gotuj 5 min, włóż mięso.','Podawaj z ziemniakami.']},
+  {id:'r49',name:'Granola domowa',icon:'🌾',cat:'sniadanie',time:35,kcal:440,p:10,w:60,t:18,
+   ing:['300g płatków owsianych','100g orzechów mieszanych','50g pestek dyni','4 łyżki miodu','3 łyżki oleju kokosowego','cynamon','wanilia'],
+   steps:['Nagrzej piekarnik do 170°C.','Wymieszaj płatki z orzechami i pestkami.','Podgrzej miód z olejem i przyprawami.','Polej mieszanką suche składniki.','Piecz 25-30 min mieszając co 10 min.','Wystudź — granola stwardnieje.']},
+  {id:'r50',name:'Tacos z wołowiną',icon:'🌮',cat:'obiad',time:25,kcal:540,p:35,w:52,t:20,
+   ing:['400g mielonej wołowiny','8 tortilli','avokado','pomidor','cebula','salsa','ser cheddar','śmietana','papryka chili','kumin','kolendra'],
+   steps:['Podsmaż cebulę, dodaj mięso.','Dopraw papryką, kminem i solą.','Smaż 10 min do odparowania płynu.','Podgrzej tortille.','Napełnij mięsem, dodaj salsę i awokado.','Posyp serem i kolendrą.']},
+];
+
+let recipeCatFilter='all';
+let recipeOpen={};
+
+function canCook(){
+  const dow=gdow(cy,cm,today.getDate());
+  return dow===4||dow===6; // Fri or Sun
+}
+
+function toggleRecipe(id){
+  recipeOpen[id]=!recipeOpen[id];
+  const body=document.getElementById('rcb-'+id);
+  if(body)body.classList.toggle('open',recipeOpen[id]);
+}
+
+function cookRecipe(id,e){
+  e.stopPropagation();
+  if(!canCook())return;
+  const C=ldC();
+  const key=`${cy}-${cm}-${today.getDate()}`;
+  if(!C[key])C[key]={};
+  C[key][id]=!C[key][id];
+  svC(C);
+  rRecipes();
+  if(C[key][id]){SFX.complete();spP(e.target);}
+  else SFX.undo();
+}
+
+function isCooked(id){
+  const C=ldC();
+  const key=`${cy}-${cm}-${today.getDate()}`;
+  return !!(C[key]&&C[key][id]);
+}
+
+function rRecipes(){
+  const mc=document.getElementById('MC');
+  const cats=['all','sniadanie','obiad','kolacja'];
+  const catLabels={all:'Wszystkie',sniadanie:'Śniadanie',obiad:'Obiad',kolacja:'Kolacja'};
+  const canC=canCook();
+
+  let html=`<div class="recipes-wrap">`;
+  html+=`<div class="recipe-filters">`;
+  cats.forEach(c=>{html+=`<button class="rf-btn${recipeCatFilter===c?' active':''}" onclick="setRFilter('${c}')">${catLabels[c]}</button>`;});
+  html+=`</div>`;
+
+  const filtered=recipeCatFilter==='all'?RECIPES:RECIPES.filter(r=>r.cat===recipeCatFilter);
+  filtered.forEach(r=>{
+    const cooked=isCooked(r.id);
+    let cookBtnClass, cookBtnLabel;
+    if(cooked){cookBtnClass='cooked-done';cookBtnLabel='✓ Ugotowane';}
+    else if(canC){cookBtnClass='can-cook';cookBtnLabel='Ugotowane 🔥';}
+    else{cookBtnClass='locked';cookBtnLabel='Pn–Czw 🔒';}
+
+    html+=`<div class="recipe-card${cooked?' cooked':''}" id="rc-${r.id}">
+      <div class="rc-header" onclick="toggleRecipe('${r.id}')">
+        <div class="rc-icon">${r.icon}</div>
+        <div class="rc-info">
+          <div class="rc-name">${r.name}</div>
+          <div class="rc-meta">
+            <span class="rc-time">⏱️ ${r.time} min</span>
+            <span>🔥 ${r.kcal} kcal</span>
+            <span>💪 ${r.p}g białka</span>
+          </div>
+        </div>
+        <button class="rc-cook-btn ${cookBtnClass}" onclick="cookRecipe('${r.id}',event)">${cookBtnLabel}</button>
+      </div>
+      <div class="rc-body${recipeOpen[r.id]?' open':''}" id="rcb-${r.id}">
+        <div class="rc-macro-grid">
+          <div class="macro-chip"><div class="macro-val">${r.kcal}</div><div class="macro-label">Kcal</div></div>
+          <div class="macro-chip"><div class="macro-val">${r.p}g</div><div class="macro-label">Białko</div></div>
+          <div class="macro-chip"><div class="macro-val">${r.w}g</div><div class="macro-label">Węglow.</div></div>
+          <div class="macro-chip"><div class="macro-val">${r.t}g</div><div class="macro-label">Tłuszcze</div></div>
+        </div>
+        <div class="rc-section-title">Składniki</div>
+        <div class="rc-ingredients">${r.ing.map(i=>`<span class="ingredient-tag">${i}</span>`).join('')}</div>
+        <div class="rc-section-title">Sposób przyrządzenia</div>
+        <ol class="rc-steps">${r.steps.map((s,i)=>`<li><div class="step-num">${i+1}</div><span>${s}</span></li>`).join('')}</ol>
+        <div style="margin-top:10px;padding:8px;background:rgba(255,69,0,.06);border-radius:10px;font-size:11px;color:var(--muted2)">⏱️ Czas przygotowania: około ${r.time} minut</div>
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  mc.innerHTML=html;
+}
+
+function setRFilter(f){recipeCatFilter=f;rRecipes();}
+
+// ── SUMMARY ──
+function rSum(){
+  const mc=document.getElementById('MC');
+  const n=gdim(cy,cm),fd=(cy===2026&&cm===2)?SD:1;
+  let td=0,tm=0,hd=[];
+  const habitCounts={};
+  DAILY_HABITS.forEach(h=>habitCounts[h.id]=0);
+  COND_HABITS.forEach(h=>habitCounts[h.id]=0);
+
+  for(let d=fd;d<=n;d++){
+    const dd=gdd(d);const dow=gdow(cy,cm,d);
+    const{done,max}=cs(d);td+=done;tm+=max;hd.push({d,done,max});
+    DAILY_HABITS.forEach(h=>{if(dd[h.id])habitCounts[h.id]++;});
+    const cond=COND_HABITS.filter(h=>h.days.includes(dow));
+    cond.forEach(h=>{if(dd[h.id])habitCounts[h.id]++;});
+  }
+  const avg=tm>0?Math.round(td/tm*100):0;
+  const xp=cXP(),lv=gLv(xp);
+  const prog=Math.min(100,((xp-lv.min)/(lv.max-lv.min))*100);
+  const fdow=gdow(cy,cm,fd);
+  let hh=DSH.map(d=>`<div class="hlb">${d}</div>`).join('');
+  for(let i=0;i<fdow;i++)hh+=`<div class="hc"></div>`;
+  hd.forEach(({d,done,max})=>{const p=max>0?done/max:0;hh+=`<div class="hc ${p===0?'':p<.4?'h1':p<.8?'h2':'h3'}${isT(d)?' toh':''}">${d}</div>`;});
+
+  const allHabits=[...DAILY_HABITS,...COND_HABITS];
+  mc.innerHTML=`<div class="swrap">
+    <div class="scard">
+      <div class="slbl">⚡ XP — ${lv.n} (LVL ${LVS.indexOf(lv)+1})</div>
+      <div style="font-size:44px;font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--fire1),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">${xp}</div>
+      <div style="font-size:10px;color:var(--muted2);margin-top:4px">Do ${lv.n==='Legend'?'max':('LVL '+(LVS.indexOf(lv)+2))}: ${lv.max} XP</div>
+      <div class="sbrw"><div class="sbb"><div class="sbf" style="width:${prog}%;background:linear-gradient(90deg,var(--lava),var(--fire1),var(--fire3))"></div></div></div>
+    </div>
+    <div class="scard">
+      <div class="slbl">Średnia miesiąca</div>
+      <div style="font-size:44px;font-weight:800;letter-spacing:-2px;background:linear-gradient(135deg,var(--fire2),var(--fire3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">${avg}%</div>
+      <div class="sbrw"><div class="sbb"><div class="sbf" style="width:${avg}%;background:linear-gradient(90deg,var(--fire1),var(--fire3))"></div></div></div>
+    </div>
+    <div class="scard"><div class="slbl">Nawyki w miesiącu</div>
+      ${allHabits.map(h=>`<div class="srow2"><div class="srl"><span style="font-size:14px">${h.icon}</span>${h.name}</div><div class="sv" style="color:var(--fire2)">${habitCounts[h.id]}</div></div>`).join('')}
+    </div>
+    <div class="scard"><div class="slbl">Heatmapa</div><div class="hgrid">${hh}</div></div>
+  </div>`;
+}
+
+// ── MONTH SELECTOR ──
+function openMS(){
+  document.getElementById('mgrid').innerHTML=MPL.map((m,i)=>`<button class="mopt ${i===cm?'active':''}" onclick="selM(${i})">${m} ${cy}</button>`).join('');
+  document.getElementById('movl').classList.add('open');
+}
+function clovl(e){if(e.target===document.getElementById('movl'))document.getElementById('movl').classList.remove('open');}
+function selM(m){cm=m;document.getElementById('mbadge').textContent=MPL[m];document.getElementById('movl').classList.remove('open');render();}
+
+// ── PWA ──
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.log('SW error:',e));}
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;setTimeout(()=>document.getElementById('installBanner').classList.add('show'),3000);});
+document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('installBanner').classList.remove('show');});
+window.addEventListener('appinstalled',()=>{document.getElementById('installBanner').classList.remove('show');});
+
+// ── INIT ──
+document.getElementById('mbadge').textContent=MPL[cm];
+render();
+setTimeout(()=>{
+  if(ctab==='days'){const el=document.getElementById(`s-${today.getDate()}`);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});const b=document.getElementById(`db-${today.getDate()}`);if(b&&!b.classList.contains('open'))b.classList.add('open');}}
+},150);
+</script>
+</body>
+</html>
